@@ -1,18 +1,27 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>io.table</groupId>
-    <artifactId>io-table-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
-  <artifactId>io-table-csv</artifactId>
-  <name>Table I/O - CSV impl</name>
-  
-  <dependencies>
-  	<dependency>
-  		<groupId>io.table</groupId>
-  		<artifactId>io-table-api</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  </dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.table</groupId>
+		<artifactId>io-table-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>io-table-csv</artifactId>
+	<name>Table I/O - CSV impl</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.table</groupId>
+			<artifactId>io-table-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- Test dependencies. -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

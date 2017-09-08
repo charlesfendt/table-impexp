@@ -22,6 +22,8 @@ package io.table.impl.csv;
 
 import io.table.api.ITableWriter;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Provider for the CSV implementation.
  *
@@ -43,8 +45,8 @@ public final class TableIoUtils {
 	 *            The separator to use.
 	 * @return a new instance of the writer implementation.
 	 */
-	public ITableWriter createWriter(final char separator) {
-		return new TableWriterCsvImpl(Character.toString(separator), "\"", "\"\"", "\n");
+	public static ITableWriter createWriter(final char separator) {
+		return new TableWriterCsvImpl(Character.toString(separator), "\"", "\"\"", "\n", StandardCharsets.UTF_8);
 	}
 
 	/**
@@ -56,8 +58,8 @@ public final class TableIoUtils {
 	 *            the quote character.
 	 * @return a new instance of the writer implementation.
 	 */
-	public ITableWriter createWriter(final char separator, final char quote) {
+	public static ITableWriter createWriter(final char separator, final char quote) {
 		final String quoteStr = Character.toString(separator);
-		return new TableWriterCsvImpl(Character.toString(separator), quoteStr, quoteStr + quoteStr, "\n");
+		return new TableWriterCsvImpl(Character.toString(separator), quoteStr, quoteStr + quoteStr, "\n", StandardCharsets.UTF_8);
 	}
 }

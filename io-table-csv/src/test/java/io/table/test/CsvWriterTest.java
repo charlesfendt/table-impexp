@@ -1,5 +1,5 @@
 /**
- * ITableWriter.java
+ * CsvWriterTest.java
  *
  * Copyright (c) 2017, Charles Fendt. All rights reserved.
  *
@@ -18,36 +18,42 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package io.table.api;
+package io.table.test;
 
-import java.io.Closeable;
+import io.table.api.ITableWriter;
+import io.table.impl.csv.TableIoUtils;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * Interface for the writer class.
+ * Test class.
  *
  * @author charles
  */
-public interface ITableWriter extends Closeable {
-
-	/**
-	 * Initialization method. The goal is to prepare the output stream for the export.
-	 * 
-	 * @param output
-	 *            Output stream to wrap.
-	 * @throws IOException
-	 *             Any I/O error.
-	 */
-	void initialize(final OutputStream output) throws IOException;
+public final class CsvWriterTest {
 	
 	/**
-	 * Append method.
-	 * 
-	 * @param cells
-	 *            The list of value for the new line.
+	 * Test method for a simple output.
+	 *
 	 * @throws IOException
-	 *             Any I/O error.
+	 *             any I/O error.
 	 */
-	void appendNewLine(final String... cells) throws IOException;
+	@Test
+	public void testSimpleOutput() throws IOException {
+		final ByteArrayOutputStream output = new ByteArrayOutputStream();
+		
+		final ITableWriter writer = TableIoUtils.createWriter(';');
+		writer.initialize(output);
+		writer.appendNewLine("a", "b", "c");
+		writer.close();
+
+		final String result = new String(output.toByteArray(), StandardCharsets.UTF_8);
+		Assert.assertEquals("\"a\";\"b\";\"c\";\n", result);
+		
+	}
 }
