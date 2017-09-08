@@ -7,4 +7,12 @@
   </parent>
   <artifactId>io-table-csv</artifactId>
   <name>Table I/O - CSV impl</name>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>io.table</groupId>
+  		<artifactId>io-table-api</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  </dependencies>
 </project>
