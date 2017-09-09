@@ -19,5 +19,6 @@
 	<modules>
 		<module>io-table-api</module>
 		<module>io-table-csv</module>
+		<module>io-table-xlsx</module>
 	</modules>
 </project>

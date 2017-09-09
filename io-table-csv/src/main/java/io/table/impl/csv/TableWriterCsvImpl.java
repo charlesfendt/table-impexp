@@ -35,7 +35,7 @@ import java.nio.charset.Charset;
  *
  */
 public final class TableWriterCsvImpl implements ITableWriter {
-	
+
 	/** The separator between value. */
 	private final String separator;
 	/** The quote string. */
@@ -46,10 +46,10 @@ public final class TableWriterCsvImpl implements ITableWriter {
 	final String newLine;
 	/** The charset to use. */
 	final Charset charset;
-	
+
 	/** The wrapped stream. */
-	private Writer output;
-	
+	private Writer outputWriter;
+
 	/**
 	 * Default constructor.
 	 *
@@ -66,62 +66,62 @@ public final class TableWriterCsvImpl implements ITableWriter {
 	 */
 	public TableWriterCsvImpl(final String separator, final String quote, final String escape, final String newLine, final Charset charset) {
 		super();
-		
+
 		this.separator = separator;
 		this.quote = quote;
 		this.escape = escape;
 		this.newLine = newLine;
 		this.charset = charset;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
 	public void close() throws IOException {
-		if (this.output != null) {
-			this.output.close();
+		if (this.outputWriter != null) {
+			this.outputWriter.close();
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see io.table.api.ITableWriter#initialize(java.io.OutputStream)
-	 */
-	@Override
-	public void initialize(final OutputStream output) throws IOException {
-
-		if (output == null) {
-			throw new IllegalArgumentException("The output stream must not be null.");
-		}
-		
-		if (this.output != null) {
-			throw new IllegalStateException("The stream is already initialized.");
-		}
-		this.output = new OutputStreamWriter(output, this.charset);
-
 	}
 	
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see io.table.api.ITableWriter#initialize(java.io.OutputStream)
+	 */
+	@Override
+	public void initialize(final OutputStream output) throws IOException {
+		
+		if (output == null) {
+			throw new IllegalArgumentException("The output stream must not be null.");
+		}
+
+		if (this.outputWriter != null) {
+			throw new IllegalStateException("The stream is already initialized.");
+		}
+		this.outputWriter = new OutputStreamWriter(output, this.charset);
+		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see io.table.api.ITableWriter#appendNewLine(java.lang.String[])
 	 */
 	@Override
 	public void appendNewLine(final String... cells) throws IOException {
 		if (cells != null) {
 			for (final String cell : cells) {
-				this.output.append(this.quote);
+				this.outputWriter.append(this.quote);
 				if (cell != null) {
-					this.output.append(cell.replace(this.quote, this.escape));
+					this.outputWriter.append(cell.replace(this.quote, this.escape));
 				}
-				this.output.append(this.quote).append(this.separator);
+				this.outputWriter.append(this.quote).append(this.separator);
 			}
 		}
-		this.output.append(this.newLine);
+		this.outputWriter.append(this.newLine);
 	}
-	
+
 }

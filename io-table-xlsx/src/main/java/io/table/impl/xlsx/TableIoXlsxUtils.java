@@ -1,5 +1,5 @@
 /**
- * CsvWriterTest.java
+ * TableIoXlsxUtils.java
  *
  * Copyright (c) 2017, Charles Fendt. All rights reserved.
  *
@@ -18,42 +18,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package io.table.test;
-
-import io.table.api.ITableWriter;
-import io.table.impl.csv.TableIoCsvUtils;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import org.junit.Assert;
-import org.junit.Test;
+package io.table.impl.xlsx;
 
 /**
- * Test class.
+ * Utility class for the XLSX implementation.
  *
  * @author charles
  */
-public final class CsvWriterTest {
+public final class TableIoXlsxUtils {
 	
 	/**
-	 * Test method for a simple output.
-	 *
-	 * @throws IOException
-	 *             any I/O error.
+	 * Hidden constructor of the utility class.
 	 */
-	@Test
-	public void testSimpleOutput() throws IOException {
-		final ByteArrayOutputStream output = new ByteArrayOutputStream();
-		
-		final ITableWriter writer = TableIoCsvUtils.createWriter(';');
-		writer.initialize(output);
-		writer.appendNewLine("a", "b", "c");
-		writer.close();
-
-		final String result = new String(output.toByteArray(), StandardCharsets.UTF_8);
-		Assert.assertEquals("\"a\";\"b\";\"c\";\n", result);
-		
+	private TableIoXlsxUtils() {
+		super();
 	}
+	
 }

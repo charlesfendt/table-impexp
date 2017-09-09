@@ -29,12 +29,12 @@ import java.nio.charset.StandardCharsets;
  *
  * @author charles
  */
-public final class TableIoUtils {
+public final class TableIoCsvUtils {
 
 	/**
 	 * Hidden constructor of the utility class.
 	 */
-	private TableIoUtils() {
+	private TableIoCsvUtils() {
 		super();
 	}
 
