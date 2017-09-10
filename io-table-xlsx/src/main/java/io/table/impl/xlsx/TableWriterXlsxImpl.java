@@ -21,6 +21,7 @@
 package io.table.impl.xlsx;
 
 import io.table.api.ITableWriter;
+import io.table.impl.xlsx.utils.StringCache;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,8 +48,16 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 	/** The name of the worksheet. */
 	private final String wsName;
 	
+	/** The output string cache. */
+	private final StringCache strCache = new StringCache();
+	
 	/** The ZIP output stream. */
 	private ZipOutputStream outputZip;
+
+	/** Position in the table. */
+	private int indexRow;
+	/** Position in the table. */
+	private int indexCol;
 	
 	/**
 	 * Default constructor.
@@ -70,8 +79,20 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 	@Override
 	public void close() throws IOException {
 		if (this.outputZip != null) {
-			// this.writeFile("xl/sharedStrings.xml", this.stringCache::write);
-			// this.writeFile("xl/styles.xml", this.styleCache::write);
+
+			// close the worksheet...
+			this.outputZip
+			        .write("</row></sheetData><pageMargins bottom=\"0.75\" footer=\"0.25\" header=\"0.25\" left=\"0.75\" right=\"0.75\" top=\"0.75\"/></worksheet>"
+			                .getBytes(StandardCharsets.UTF_8));
+			this.outputZip.closeEntry();
+
+			// dump the string cache
+			this.outputZip.putNextEntry(new ZipEntry("xl/sharedStrings.xml"));
+			this.strCache.write(this.outputZip);
+			this.outputZip.closeEntry();
+			
+			// dump styles xl/styles.xml
+			// FIXME
 
 			this.outputZip.close();
 		}
@@ -106,7 +127,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 						+ (this.applicationVersion == null ? "" : "<AppVersion>" + this.applicationVersion + "</AppVersion>") + "</Properties>",
 						StandardCharsets.UTF_8);
 		
-		final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+		final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 		
 		this.writeFileContent(
@@ -127,6 +148,13 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 				"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Target=\"sharedStrings.xml\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings\"/><Relationship Id=\"rId2\" Target=\"styles.xml\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\"/>"
 						+ "<Relationship Id=\"rId3\" Target=\"worksheets/sheet1.xml\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\"/>"
 						+ "</Relationships>", StandardCharsets.UTF_8);
+		
+		// Initialize the worksheet
+		this.outputZip.putNextEntry(new ZipEntry("xl/worksheets/sheet1.xml"));
+		this.outputZip
+		        .write("<?xml version=\"1.0\" encoding=\"UTF-8\"?><worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><dimension ref=\"A1\"/><sheetViews><sheetView workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15.0\"/><sheetData>"
+		                .getBytes(StandardCharsets.UTF_8));
+		this.addRow(false);
 	}
 	
 	/*
@@ -137,7 +165,12 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 	@Override
 	public void appendNewLine(final String... cells) throws IOException {
 		// TODO Auto-generated method stub
+		for (final String cell : cells) {
+			++this.indexCol;
+			final Integer index = this.strCache.addToCache(cell);
+		}
 		
+		this.addRow(true);
 	}
 	
 	/**
@@ -156,5 +189,23 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 		this.outputZip.putNextEntry(new ZipEntry(name));
 		this.outputZip.write(content.getBytes(charset));
 		this.outputZip.closeEntry();
+	}
+	
+	/**
+	 * Method to append a new row.
+	 *
+	 * @param closePrevious
+	 *            TRUE to close the previous one.
+	 * @throws IOException
+	 *             Any I/O error.
+	 */
+	private void addRow(final boolean closePrevious) throws IOException {
+		final StringBuilder str = new StringBuilder();
+		if (closePrevious) {
+			str.append("</row>");
+		}
+		str.append("<row r=\"").append(++this.indexRow).append("\">");
+		this.outputZip.write(str.toString().getBytes(StandardCharsets.UTF_8));
+		this.indexCol = 0;
 	}
 }

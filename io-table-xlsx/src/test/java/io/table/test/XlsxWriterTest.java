@@ -1,5 +1,5 @@
 /**
- * TableIoXlsxUtils.java
+ * CsvWriterTest.java
  *
  * Copyright (c) 2017, Charles Fendt. All rights reserved.
  *
@@ -18,31 +18,41 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package io.table.impl.xlsx;
+package io.table.test;
 
 import io.table.api.ITableWriter;
+import io.table.impl.xlsx.TableIoXlsxUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.junit.Test;
 
 /**
- * Utility class for the XLSX implementation.
+ * Test class.
  *
  * @author charles
  */
-public final class TableIoXlsxUtils {
+public final class XlsxWriterTest {
 
 	/**
-	 * Hidden constructor of the utility class.
-	 */
-	private TableIoXlsxUtils() {
-		super();
-	}
-	
-	/**
-	 * Creator method for the XLSX implementation of the ITableWriter service.
+	 * Test method for a simple output.
 	 *
-	 * @return a new instance of the writer implementation.
+	 * @throws IOException
+	 *             any I/O error.
 	 */
-	public static ITableWriter createWriter() {
-		return new TableWriterXlsxImpl("io.table", "1.0", "data");
+	@Test
+	public void testSimpleOutput() throws IOException {
+		final File out = new File("./test.xlsx");
+		out.createNewFile();
+		try (final OutputStream output = new FileOutputStream(out)) {
+
+			final ITableWriter writer = TableIoXlsxUtils.createWriter();
+			writer.initialize(output);
+			// writer.appendNewLine("a", "b", "c");
+			writer.close();
+		}
 	}
-	
 }
