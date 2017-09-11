@@ -23,6 +23,7 @@ package io.table.api;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 /**
  * Interface for the writer class.
@@ -33,7 +34,7 @@ public interface ITableWriter extends Closeable {
 
 	/**
 	 * Initialization method. The goal is to prepare the output stream for the export.
-	 * 
+	 *
 	 * @param output
 	 *            Output stream to wrap.
 	 * @throws IOException
@@ -43,7 +44,45 @@ public interface ITableWriter extends Closeable {
 	
 	/**
 	 * Append method.
-	 * 
+	 *
+	 * @param value
+	 *            The value to append.
+	 * @throws IOException
+	 *             Any I/O error.
+	 */
+	void appendCell(String value) throws IOException;
+
+	/**
+	 * Append method.
+	 *
+	 * @param value
+	 *            The value to append.
+	 * @throws IOException
+	 *             Any I/O error.
+	 */
+	void appendCell(long value) throws IOException;
+
+	/**
+	 * Append method.
+	 *
+	 * @param value
+	 *            The value to append.
+	 * @throws IOException
+	 *             Any I/O error.
+	 */
+	void appendCell(Date value) throws IOException;
+
+	/**
+	 * Append method.
+	 *
+	 * @throws IOException
+	 *             Any I/O error.
+	 */
+	void appendNewLine() throws IOException;
+	
+	/**
+	 * Append method.
+	 *
 	 * @param cells
 	 *            The list of value for the new line.
 	 * @throws IOException

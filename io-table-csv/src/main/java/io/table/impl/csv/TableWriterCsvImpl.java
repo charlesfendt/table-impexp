@@ -27,6 +27,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * The Writer implementation.
@@ -36,6 +39,9 @@ import java.nio.charset.Charset;
  */
 public final class TableWriterCsvImpl implements ITableWriter {
 
+	/** date formater. */
+	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
 	/** The separator between value. */
 	private final String separator;
 	/** The quote string. */
@@ -46,10 +52,10 @@ public final class TableWriterCsvImpl implements ITableWriter {
 	final String newLine;
 	/** The charset to use. */
 	final Charset charset;
-
+	
 	/** The wrapped stream. */
 	private Writer outputWriter;
-
+	
 	/**
 	 * Default constructor.
 	 *
@@ -66,17 +72,17 @@ public final class TableWriterCsvImpl implements ITableWriter {
 	 */
 	public TableWriterCsvImpl(final String separator, final String quote, final String escape, final String newLine, final Charset charset) {
 		super();
-
+		
 		this.separator = separator;
 		this.quote = quote;
 		this.escape = escape;
 		this.newLine = newLine;
 		this.charset = charset;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
@@ -85,29 +91,80 @@ public final class TableWriterCsvImpl implements ITableWriter {
 			this.outputWriter.close();
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see io.table.api.ITableWriter#initialize(java.io.OutputStream)
 	 */
 	@Override
 	public void initialize(final OutputStream output) throws IOException {
-		
+
 		if (output == null) {
 			throw new IllegalArgumentException("The output stream must not be null.");
 		}
-
+		
 		if (this.outputWriter != null) {
 			throw new IllegalStateException("The stream is already initialized.");
 		}
 		this.outputWriter = new OutputStreamWriter(output, this.charset);
-		
+
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see io.table.api.ITableWriter#appendCell(java.lang.String)
+	 */
+	@Override
+	public void appendCell(final String value) throws IOException {
+		this.outputWriter.append(this.quote);
+		if (value != null) {
+			this.outputWriter.append(value.replace(this.quote, this.escape));
+		}
+		this.outputWriter.append(this.quote).append(this.separator);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 *
+	 * @see io.table.api.ITableWriter#appendCell(long)
+	 */
+	@Override
+	public void appendCell(final long value) throws IOException {
+		this.outputWriter.append(this.quote);
+		this.outputWriter.append(Long.toString(value));
+		this.outputWriter.append(this.quote).append(this.separator);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see io.table.api.ITableWriter#appendCell(java.util.Date)
+	 */
+	@Override
+	public void appendCell(final Date value) throws IOException {
+		this.outputWriter.append(this.quote);
+		if (value != null) {
+			final String date = this.df.format(value);
+			this.outputWriter.append(date.replace(this.quote, this.escape));
+		}
+		this.outputWriter.append(this.quote).append(this.separator);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see io.table.api.ITableWriter#appendNewLine()
+	 */
+	@Override
+	public void appendNewLine() throws IOException {
+		this.outputWriter.append(this.newLine);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see io.table.api.ITableWriter#appendNewLine(java.lang.String[])
 	 */
 	@Override
@@ -123,5 +180,5 @@ public final class TableWriterCsvImpl implements ITableWriter {
 		}
 		this.outputWriter.append(this.newLine);
 	}
-
+	
 }
