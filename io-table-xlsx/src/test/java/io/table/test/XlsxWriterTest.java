@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ import org.junit.Test;
  * @author charles
  */
 public final class XlsxWriterTest {
-	
+
 	/**
 	 * Test method for a simple output.
 	 *
@@ -48,10 +49,14 @@ public final class XlsxWriterTest {
 		final File out = new File("./test.xlsx");
 		out.createNewFile();
 		try (final OutputStream output = new FileOutputStream(out)) {
-			
+
 			final ITableWriter writer = TableIoXlsxUtils.createWriter();
 			writer.initialize(output);
 			writer.appendNewLine("a", "b", "c");
+			writer.appendNewLine();
+			writer.appendCell("foo");
+			writer.appendCell(12345);
+			writer.appendCell(new Date());
 			writer.close();
 		}
 	}

@@ -31,7 +31,7 @@ import java.util.Date;
  * @author charles
  */
 public interface ITableWriter extends Closeable {
-
+	
 	/**
 	 * Initialization method. The goal is to prepare the output stream for the export.
 	 *
@@ -41,7 +41,7 @@ public interface ITableWriter extends Closeable {
 	 *             Any I/O error.
 	 */
 	void initialize(final OutputStream output) throws IOException;
-	
+
 	/**
 	 * Append method.
 	 *
@@ -51,7 +51,7 @@ public interface ITableWriter extends Closeable {
 	 *             Any I/O error.
 	 */
 	void appendCell(String value) throws IOException;
-
+	
 	/**
 	 * Append method.
 	 *
@@ -70,8 +70,18 @@ public interface ITableWriter extends Closeable {
 	 * @throws IOException
 	 *             Any I/O error.
 	 */
+	void appendCell(double value) throws IOException;
+	
+	/**
+	 * Append method.
+	 *
+	 * @param value
+	 *            The value to append.
+	 * @throws IOException
+	 *             Any I/O error.
+	 */
 	void appendCell(Date value) throws IOException;
-
+	
 	/**
 	 * Append method.
 	 *
@@ -79,7 +89,7 @@ public interface ITableWriter extends Closeable {
 	 *             Any I/O error.
 	 */
 	void appendNewLine() throws IOException;
-	
+
 	/**
 	 * Append method.
 	 *

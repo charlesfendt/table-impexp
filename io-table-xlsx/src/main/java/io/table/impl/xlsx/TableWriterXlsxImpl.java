@@ -198,6 +198,22 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 	/*
 	 * (non-Javadoc)
 	 *
+	 * @see io.table.api.ITableWriter#appendCell(long)
+	 */
+	@Override
+	public void appendCell(final double value) throws IOException {
+		// open a new row if not already opened
+		this.openRow();
+
+		++this.indexCol;
+		final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow) + "\" t=\"n\"><v>"
+		        + Double.toString(value) + "</v></c>";
+		this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see io.table.api.ITableWriter#appendCell(java.util.Date)
 	 */
 	@Override
@@ -205,6 +221,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 		// open a new row if not already opened
 		this.openRow();
 		
+		// FIXME !
 		++this.indexCol;
 		final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow) + "\" t=\"n\"><v>"
 		        + (value == null ? "" : this.df.format(value)) + "</v></c>";
