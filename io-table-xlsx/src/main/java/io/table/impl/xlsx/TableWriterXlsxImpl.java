@@ -59,6 +59,9 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 	/** Position in the table. */
 	private int indexCol;
 	
+	/** TRUE if the row is opened. */
+	private boolean rowOpened;
+	
 	/**
 	 * Default constructor.
 	 */
@@ -81,8 +84,9 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 		if (this.outputZip != null) {
 
 			// close the worksheet...
+			this.closeRow();
 			this.outputZip
-			        .write("</row></sheetData><pageMargins bottom=\"0.75\" footer=\"0.25\" header=\"0.25\" left=\"0.75\" right=\"0.75\" top=\"0.75\"/></worksheet>"
+			        .write("</sheetData><pageMargins bottom=\"0.75\" footer=\"0.25\" header=\"0.25\" left=\"0.75\" right=\"0.75\" top=\"0.75\"/></worksheet>"
 			                .getBytes(StandardCharsets.UTF_8));
 			this.outputZip.closeEntry();
 
@@ -154,7 +158,6 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 		this.outputZip
 		        .write("<?xml version=\"1.0\" encoding=\"UTF-8\"?><worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><dimension ref=\"A1\"/><sheetViews><sheetView workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15.0\"/><sheetData>"
 		                .getBytes(StandardCharsets.UTF_8));
-		this.addRow(false);
 	}
 	
 	/*
@@ -164,13 +167,19 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 	 */
 	@Override
 	public void appendNewLine(final String... cells) throws IOException {
+		// open a new row if not already opened
+		this.openRow();
+		
 		// TODO Auto-generated method stub
 		for (final String cell : cells) {
 			++this.indexCol;
-			final Integer index = this.strCache.addToCache(cell);
+			final int index = this.strCache.addToCache(cell);
+			final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow) + "\" t=\"s\"><v>"
+					+ Integer.toString(index) + "</v></c>";
+			this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
 		}
 		
-		this.addRow(true);
+		this.closeRow();
 	}
 	
 	/**
@@ -194,18 +203,45 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 	/**
 	 * Method to append a new row.
 	 *
-	 * @param closePrevious
-	 *            TRUE to close the previous one.
 	 * @throws IOException
 	 *             Any I/O error.
 	 */
-	private void addRow(final boolean closePrevious) throws IOException {
-		final StringBuilder str = new StringBuilder();
-		if (closePrevious) {
-			str.append("</row>");
+	private void openRow() throws IOException {
+		if (!this.rowOpened) {
+			this.outputZip.write(("<row r=\"" + Integer.toString(++this.indexRow) + "\">").getBytes(StandardCharsets.UTF_8));
+			this.indexCol = 0;
+			this.rowOpened = true;
 		}
-		str.append("<row r=\"").append(++this.indexRow).append("\">");
-		this.outputZip.write(str.toString().getBytes(StandardCharsets.UTF_8));
-		this.indexCol = 0;
+	}
+
+	/**
+	 * Method to close a new row.
+	 *
+	 * @throws IOException
+	 *             Any I/O error.
+	 */
+	private void closeRow() throws IOException {
+		if (this.rowOpened) {
+			this.outputZip.write("</row>".getBytes(StandardCharsets.UTF_8));
+			this.rowOpened = false;
+		}
+	}
+	
+	/**
+	 * Convert a column index to a column name.
+	 *
+	 * @param column
+	 *            one-based column index.
+	 * @return Column name.
+	 */
+	private static String colToString(final int column) {
+		final StringBuilder sb = new StringBuilder();
+		int c = column - 1;
+		while (c >= 0) {
+			final int cur = c % 26;
+			sb.append((char) ('A' + cur));
+			c = (c - cur) / 26 - 1;
+		}
+		return sb.reverse().toString();
 	}
 }

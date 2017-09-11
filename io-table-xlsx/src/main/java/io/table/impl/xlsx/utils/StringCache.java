@@ -34,11 +34,11 @@ import java.util.Map;
  * @author charles
  */
 public final class StringCache {
-
+	
 	private int cacheSize;
 	private final Map<String, Integer> cacheMap = new HashMap<>();
 	private final List<String> cacheLst = new LinkedList<>();
-	
+
 	/**
 	 * Method to add (if necessary) the given string to the cache.
 	 *
@@ -51,7 +51,7 @@ public final class StringCache {
 			final int result;
 			final Integer cur = this.cacheMap.get(str);
 			if (cur == null) {
-				result = ++this.cacheSize;
+				result = this.cacheSize++;
 				this.cacheLst.add(str);
 				this.cacheMap.put(str, result);
 			} else {
@@ -60,7 +60,7 @@ public final class StringCache {
 			return result;
 		}
 	}
-	
+
 	/**
 	 * Write this cache as an XML file.
 	 *
@@ -72,7 +72,7 @@ public final class StringCache {
 	public void write(final OutputStream output) throws IOException {
 		synchronized (this.cacheMap) {
 			final String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sst xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" count=\""
-					+ this.cacheSize + "\" uniqueCount=\"" + this.cacheSize + "\">";
+			        + this.cacheSize + "\" uniqueCount=\"" + this.cacheSize + "\">";
 			output.write(header.getBytes(StandardCharsets.UTF_8));
 			for (final String str : this.cacheLst) {
 				final String data = "<si><t>" + str + "</t></si>";
@@ -81,5 +81,5 @@ public final class StringCache {
 			output.write("</sst>".getBytes(StandardCharsets.UTF_8));
 		}
 	}
-
+	
 }
