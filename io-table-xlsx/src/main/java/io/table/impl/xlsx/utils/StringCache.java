@@ -34,52 +34,55 @@ import java.util.Map;
  * @author charles
  */
 public final class StringCache {
-	
-	private int cacheSize;
-	private final Map<String, Integer> cacheMap = new HashMap<>();
-	private final List<String> cacheLst = new LinkedList<>();
 
-	/**
-	 * Method to add (if necessary) the given string to the cache.
-	 *
-	 * @param str
-	 *            String to add.
-	 * @return The index of the string in the insert order.
-	 */
-	public int addToCache(final String str) {
-		synchronized (this.cacheMap) {
-			final int result;
-			final Integer cur = this.cacheMap.get(str);
-			if (cur == null) {
-				result = this.cacheSize++;
-				this.cacheLst.add(str);
-				this.cacheMap.put(str, result);
-			} else {
-				result = cur.intValue();
-			}
-			return result;
-		}
-	}
+    /** Size of the String cache. */
+    private int cacheSize;
+    /** Map to find the index of a string in the string cache. */
+    private final Map<String, Integer> cacheMap = new HashMap<>();
+    /** List of cached string. */
+    private final List<String> cacheLst = new LinkedList<>();
 
-	/**
-	 * Write this cache as an XML file.
-	 *
-	 * @param output
-	 *            Write where to dump the cache.
-	 * @throws IOException
-	 *             If an I/O error occurs.
-	 */
-	public void write(final OutputStream output) throws IOException {
-		synchronized (this.cacheMap) {
-			final String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sst xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" count=\""
-			        + this.cacheSize + "\" uniqueCount=\"" + this.cacheSize + "\">";
-			output.write(header.getBytes(StandardCharsets.UTF_8));
-			for (final String str : this.cacheLst) {
-				final String data = "<si><t>" + str + "</t></si>";
-				output.write(data.getBytes(StandardCharsets.UTF_8));
-			}
-			output.write("</sst>".getBytes(StandardCharsets.UTF_8));
-		}
-	}
-	
+    /**
+     * Method to add (if necessary) the given string to the cache.
+     *
+     * @param str
+     *            String to add.
+     * @return The index of the string in the insert order.
+     */
+    public int addToCache(final String str) {
+        synchronized (this.cacheMap) {
+            final int result;
+            final Integer cur = this.cacheMap.get(str);
+            if (cur == null) {
+                result = this.cacheSize++;
+                this.cacheLst.add(str);
+                this.cacheMap.put(str, result);
+            } else {
+                result = cur.intValue();
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Write this cache as an XML file.
+     *
+     * @param output
+     *            Write where to dump the cache.
+     * @throws IOException
+     *             If an I/O error occurs.
+     */
+    public void write(final OutputStream output) throws IOException {
+        synchronized (this.cacheMap) {
+            final String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sst xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" count=\""
+                    + this.cacheSize + "\" uniqueCount=\"" + this.cacheSize + "\">";
+            output.write(header.getBytes(StandardCharsets.UTF_8));
+            for (final String str : this.cacheLst) {
+                final String data = "<si><t>" + str + "</t></si>";
+                output.write(data.getBytes(StandardCharsets.UTF_8));
+            }
+            output.write("</sst>".getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
 }
