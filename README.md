@@ -6,7 +6,7 @@ Toolbox for table import/ export in different format (CSV and XLSX for example)
 - Run also on Android !
 
 # Known issue
-- XLSX eport of date is buggy :-(
+- None :-) The bug with Excel date is now fixed !
 
 # RoadMap
 - I plan to add an import interface (stream mode too)
