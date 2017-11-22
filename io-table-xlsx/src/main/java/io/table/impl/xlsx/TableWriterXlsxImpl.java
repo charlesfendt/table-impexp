@@ -33,10 +33,12 @@ import java.util.zip.ZipOutputStream;
 
 import io.table.api.ITableWriter;
 import io.table.impl.xlsx.utils.StringCache;
+import io.table.impl.xlsx.utils.StyleCache;
 
 /**
- * @author charles
+ * XLSX implementation.
  *
+ * @author charles
  */
 public final class TableWriterXlsxImpl implements ITableWriter {
 
@@ -53,6 +55,8 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
     /** The output string cache. */
     private final StringCache strCache = new StringCache();
+    /** The output style cache. */
+    private final StyleCache styleCache = new StyleCache();
 
     /** The ZIP output stream. */
     private ZipOutputStream outputZip;
@@ -67,7 +71,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param applicationName
      *            The application name for XLSX header
      * @param applicationVersion
@@ -108,7 +112,9 @@ public final class TableWriterXlsxImpl implements ITableWriter {
             this.outputZip.closeEntry();
 
             // dump styles xl/styles.xml
-            // FIXME
+            this.outputZip.putNextEntry(new ZipEntry("xl/styles.xml"));
+            this.styleCache.writeStyleContent(this.outputZip);
+            this.outputZip.closeEntry();
 
             this.outputZip.close();
         }
@@ -229,17 +235,17 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         // open a new row if not already opened
         this.openRow();
 
-        // FIXME !
         ++this.indexCol;
+        // number of days since 01.01.1900 + 2
+        final String val = value == null ? "" : Double.toString(value.getTime() / 86_400_000.0d + 25569.0d);
         final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol)
-                + Integer.toString(this.indexRow) + "\" t=\"n\"><v>" + (value == null ? "" : this.df.format(value))
-                + "</v></c>";
+                + Integer.toString(this.indexRow) + "\" t=\"n\" s=\"2\"><v>" + val + "</v></c>";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see io.table.api.ITableWriter#appendNewLine()
      */
     @Override
