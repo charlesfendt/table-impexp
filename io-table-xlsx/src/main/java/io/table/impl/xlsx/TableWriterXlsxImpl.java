@@ -32,6 +32,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import io.table.api.ITableWriter;
+import io.table.impl.xlsx.utils.CommentCache;
 import io.table.impl.xlsx.utils.StringCache;
 import io.table.impl.xlsx.utils.StyleCache;
 
@@ -54,9 +55,11 @@ public final class TableWriterXlsxImpl implements ITableWriter {
     private final String wsName;
 
     /** The output string cache. */
-    private final StringCache strCache = new StringCache();
+    private final StringCache stringCache = new StringCache();
     /** The output style cache. */
     private final StyleCache styleCache = new StyleCache();
+    /** The output comment cache. */
+    private final CommentCache commentCache = new CommentCache();
 
     /** The ZIP output stream. */
     private ZipOutputStream outputZip;
@@ -108,12 +111,17 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
             // dump the string cache
             this.outputZip.putNextEntry(new ZipEntry("xl/sharedStrings.xml"));
-            this.strCache.write(this.outputZip);
+            this.stringCache.write(this.outputZip);
             this.outputZip.closeEntry();
 
             // dump styles xl/styles.xml
             this.outputZip.putNextEntry(new ZipEntry("xl/styles.xml"));
-            this.styleCache.writeStyleContent(this.outputZip);
+            this.styleCache.write(this.outputZip);
+            this.outputZip.closeEntry();
+
+            // dump comment xl/comments1.xml
+            this.outputZip.putNextEntry(new ZipEntry("xl/comments.xml"));
+            this.commentCache.write(this.outputZip);
             this.outputZip.closeEntry();
 
             this.outputZip.close();
@@ -137,11 +145,18 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         }
         this.outputZip = new ZipOutputStream(output);
 
-        this.writeFileContent("[Content_Types].xml",
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/sharedStrings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/>"
-                        + "<Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/>"
-                        + "<Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/><Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/></Types>",
-                StandardCharsets.UTF_8);
+        this.writeFileContent("[Content_Types].xml", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" //$NON-NLS-2$
+                + "<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">" //$NON-NLS-1$
+                + "<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/>" //$NON-NLS-1$
+                + "<Default Extension=\"xml\" ContentType=\"application/xml\"/>" //$NON-NLS-1$
+                + "<Override PartName=\"/xl/sharedStrings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml\"/>" //$NON-NLS-1$
+                + "<Override PartName=\"/xl/comments1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml\"/>" //$NON-NLS-1$
+                + "<Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/>" //$NON-NLS-1$
+                + "<Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/>" //$NON-NLS-1$
+                + "<Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/>" //$NON-NLS-1$
+                + "<Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/>" //$NON-NLS-1$
+                + "<Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/>" //$NON-NLS-1$
+                + "</Types>", StandardCharsets.UTF_8);
         this.writeFileContent("docProps/app.xml",
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\"><Application>"
                         + this.applicationName + "</Application>"
@@ -179,68 +194,89 @@ public final class TableWriterXlsxImpl implements ITableWriter {
     /*
      * (non-Javadoc)
      *
-     * @see io.table.api.ITableWriter#appendCell(java.lang.String)
+     * @see io.table.api.ITableWriter#appendCell(java.lang.String, boolean, java.lang.String)
      */
     @Override
-    public void appendCell(final String value) throws IOException {
+    public void appendCell(final String value, final boolean isHeader, final String comment) throws IOException {
         // open a new row if not already opened
         this.openRow();
-
         ++this.indexCol;
-        final int index = this.strCache.addToCache(value);
-        final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol)
-                + Integer.toString(this.indexRow) + "\" t=\"s\"><v>" + Integer.toString(index) + "</v></c>";
+
+        final int index = this.stringCache.addToCache(value);
+
+        final String style = isHeader ? " s=\"1\"" : "";
+        final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+
+        final String cellStr = "<c r=\"" + ref + "\" t=\"s\"" + style + "><v>" + Integer.toString(index) + "</v></c>";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
+        if (comment != null && !comment.isEmpty()) {
+            this.commentCache.addComment(ref, comment);
+        }
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see io.table.api.ITableWriter#appendCell(long)
+     * @see io.table.api.ITableWriter#appendCell(long, boolean, java.lang.String)
      */
     @Override
-    public void appendCell(final long value) throws IOException {
+    public void appendCell(final long value, final boolean isHeader, final String comment) throws IOException {
         // open a new row if not already opened
         this.openRow();
-
         ++this.indexCol;
-        final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol)
-                + Integer.toString(this.indexRow) + "\" t=\"n\"><v>" + Long.toString(value) + "</v></c>";
+
+        final String style = isHeader ? " s=\"1\"" : "";
+        final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+
+        final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + Long.toString(value) + "</v></c>";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
+        if (comment != null && !comment.isEmpty()) {
+            this.commentCache.addComment(ref, comment);
+        }
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see io.table.api.ITableWriter#appendCell(long)
+     * @see io.table.api.ITableWriter#appendCell(double, boolean, java.lang.String)
      */
     @Override
-    public void appendCell(final double value) throws IOException {
+    public void appendCell(final double value, final boolean isHeader, final String comment) throws IOException {
         // open a new row if not already opened
         this.openRow();
-
         ++this.indexCol;
-        final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol)
-                + Integer.toString(this.indexRow) + "\" t=\"n\"><v>" + Double.toString(value) + "</v></c>";
+
+        final String style = isHeader ? " s=\"1\"" : "";
+        final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+
+        final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + Double.toString(value) + "</v></c>";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
+        if (comment != null && !comment.isEmpty()) {
+            this.commentCache.addComment(ref, comment);
+        }
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see io.table.api.ITableWriter#appendCell(java.util.Date)
+     * @see io.table.api.ITableWriter#appendCell(java.util.Date, boolean, java.lang.String)
      */
     @Override
-    public void appendCell(final Date value) throws IOException {
+    public void appendCell(final Date value, final boolean isHeader, final String comment) throws IOException {
         // open a new row if not already opened
         this.openRow();
-
         ++this.indexCol;
+
         // number of days since 01.01.1900 + 2
         final String val = value == null ? "" : Double.toString(value.getTime() / 86_400_000.0d + 25569.0d);
-        final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol)
-                + Integer.toString(this.indexRow) + "\" t=\"n\" s=\"2\"><v>" + val + "</v></c>";
+        final String style = isHeader ? " s=\"3\"" : " s=\"2\"";
+        final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+
+        final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + val + "</v></c>";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
+        if (comment != null && !comment.isEmpty()) {
+            this.commentCache.addComment(ref, comment);
+        }
     }
 
     /*
@@ -263,14 +299,44 @@ public final class TableWriterXlsxImpl implements ITableWriter {
      */
     @Override
     public void appendNewLine(final String... cells) throws IOException {
+        this.appendNewLine(false, cells);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendNewHeaderLine(java.lang.String[])
+     */
+    @Override
+    public void appendNewHeaderLine(final String... cells) throws IOException {
+        this.appendNewLine(true, cells);
+    }
+
+    /**
+     * Method to add a new line with style parameter.
+     * 
+     * @param isHeader
+     *            TRUE if the line is a header.
+     * @param cells
+     *            List of values to append.
+     * @throws IOException
+     *             Any I/O error.
+     */
+    public void appendNewLine(final boolean isHeader, final String... cells) throws IOException {
         // open a new row if not already opened
         this.openRow();
 
+        final String style = isHeader ? " s=\"3\"" : " s=\"2\"";
+
         for (final String cell : cells) {
             ++this.indexCol;
-            final int index = this.strCache.addToCache(cell);
-            final String cellStr = "<c r=\"" + TableWriterXlsxImpl.colToString(this.indexCol)
-                    + Integer.toString(this.indexRow) + "\" t=\"s\"><v>" + Integer.toString(index) + "</v></c>";
+
+            final int index = this.stringCache.addToCache(cell);
+
+            final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+
+            final String cellStr = "<c r=\"" + ref + "\" t=\"s\"" + style + "><v>" + Integer.toString(index)
+                    + "</v></c>";
             this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
         }
 
@@ -340,5 +406,45 @@ public final class TableWriterXlsxImpl implements ITableWriter {
             c = (c - cur) / 26 - 1;
         }
         return sb.reverse().toString();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(java.lang.String)
+     */
+    @Override
+    public void appendCell(final String value) throws IOException {
+        this.appendCell(value, false, null);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(long)
+     */
+    @Override
+    public void appendCell(final long value) throws IOException {
+        this.appendCell(value, false, null);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(double)
+     */
+    @Override
+    public void appendCell(final double value) throws IOException {
+        this.appendCell(value, false, null);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(java.util.Date)
+     */
+    @Override
+    public void appendCell(final Date value) throws IOException {
+        this.appendCell(value, false, null);
     }
 }

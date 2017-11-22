@@ -20,8 +20,6 @@
  */
 package io.table.impl.csv;
 
-import io.table.api.ITableWriter;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -31,6 +29,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import io.table.api.ITableWriter;
+
 /**
  * The Writer implementation.
  *
@@ -38,155 +38,211 @@ import java.util.Date;
  *
  */
 public final class TableWriterCsvImpl implements ITableWriter {
-	
-	/** date formater. */
-	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	/** The separator between value. */
-	private final String separator;
-	/** The quote string. */
-	private final String quote;
-	/** the escape sequence for the quote. */
-	private final String escape;
-	/** The newline separator. */
-	final String newLine;
-	/** The charset to use. */
-	final Charset charset;
+    /** date formater. */
+    private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	/** The wrapped stream. */
-	private Writer outputWriter;
+    /** The separator between value. */
+    private final String separator;
+    /** The quote string. */
+    private final String quote;
+    /** the escape sequence for the quote. */
+    private final String escape;
+    /** The newline separator. */
+    final String newLine;
+    /** The charset to use. */
+    final Charset charset;
 
-	/**
-	 * Default constructor.
-	 *
-	 * @param separator
-	 *            The separator between value.
-	 * @param quote
-	 *            The quote string.
-	 * @param escape
-	 *            the escape sequence for the quote.
-	 * @param newLine
-	 *            The newline separator.
-	 * @param charset
-	 *            The charset to use for the output.
-	 */
-	public TableWriterCsvImpl(final String separator, final String quote, final String escape, final String newLine, final Charset charset) {
-		super();
+    /** The wrapped stream. */
+    private Writer outputWriter;
 
-		this.separator = separator;
-		this.quote = quote;
-		this.escape = escape;
-		this.newLine = newLine;
-		this.charset = charset;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.io.Closeable#close()
-	 */
-	@Override
-	public void close() throws IOException {
-		if (this.outputWriter != null) {
-			this.outputWriter.close();
-		}
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see io.table.api.ITableWriter#initialize(java.io.OutputStream)
-	 */
-	@Override
-	public void initialize(final OutputStream output) throws IOException {
-		
-		if (output == null) {
-			throw new IllegalArgumentException("The output stream must not be null.");
-		}
+    /**
+     * Default constructor.
+     *
+     * @param separator
+     *            The separator between value.
+     * @param quote
+     *            The quote string.
+     * @param escape
+     *            the escape sequence for the quote.
+     * @param newLine
+     *            The newline separator.
+     * @param charset
+     *            The charset to use for the output.
+     */
+    public TableWriterCsvImpl(final String separator, final String quote, final String escape, final String newLine,
+            final Charset charset) {
+        super();
 
-		if (this.outputWriter != null) {
-			throw new IllegalStateException("The stream is already initialized.");
-		}
-		this.outputWriter = new OutputStreamWriter(output, this.charset);
-		
-	}
+        this.separator = separator;
+        this.quote = quote;
+        this.escape = escape;
+        this.newLine = newLine;
+        this.charset = charset;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see io.table.api.ITableWriter#appendCell(java.lang.String)
-	 */
-	@Override
-	public void appendCell(final String value) throws IOException {
-		this.outputWriter.append(this.quote);
-		if (value != null) {
-			this.outputWriter.append(value.replace(this.quote, this.escape));
-		}
-		this.outputWriter.append(this.quote).append(this.separator);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see io.table.api.ITableWriter#appendCell(long)
-	 */
-	@Override
-	public void appendCell(final long value) throws IOException {
-		this.outputWriter.append(this.quote).append(Long.toString(value)).append(this.quote).append(this.separator);
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.io.Closeable#close()
+     */
+    @Override
+    public void close() throws IOException {
+        if (this.outputWriter != null) {
+            this.outputWriter.close();
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see io.table.api.ITableWriter#appendCell(long)
-	 */
-	@Override
-	public void appendCell(final double value) throws IOException {
-		this.outputWriter.append(this.quote).append(Double.toString(value)).append(this.quote).append(this.separator);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see io.table.api.ITableWriter#appendCell(java.util.Date)
-	 */
-	@Override
-	public void appendCell(final Date value) throws IOException {
-		this.outputWriter.append(this.quote);
-		if (value != null) {
-			final String date = this.df.format(value);
-			this.outputWriter.append(date.replace(this.quote, this.escape));
-		}
-		this.outputWriter.append(this.quote).append(this.separator);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see io.table.api.ITableWriter#appendNewLine()
-	 */
-	@Override
-	public void appendNewLine() throws IOException {
-		this.outputWriter.append(this.newLine);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see io.table.api.ITableWriter#appendNewLine(java.lang.String[])
-	 */
-	@Override
-	public void appendNewLine(final String... cells) throws IOException {
-		if (cells != null) {
-			for (final String cell : cells) {
-				this.outputWriter.append(this.quote);
-				if (cell != null) {
-					this.outputWriter.append(cell.replace(this.quote, this.escape));
-				}
-				this.outputWriter.append(this.quote).append(this.separator);
-			}
-		}
-		this.outputWriter.append(this.newLine);
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#initialize(java.io.OutputStream)
+     */
+    @Override
+    public void initialize(final OutputStream output) throws IOException {
+
+        if (output == null) {
+            throw new IllegalArgumentException("The output stream must not be null.");
+        }
+
+        if (this.outputWriter != null) {
+            throw new IllegalStateException("The stream is already initialized.");
+        }
+        this.outputWriter = new OutputStreamWriter(output, this.charset);
+
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(java.lang.String)
+     */
+    @Override
+    public void appendCell(final String value) throws IOException {
+        this.outputWriter.append(this.quote);
+        if (value != null) {
+            this.outputWriter.append(value.replace(this.quote, this.escape));
+        }
+        this.outputWriter.append(this.quote).append(this.separator);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(long)
+     */
+    @Override
+    public void appendCell(final long value) throws IOException {
+        this.outputWriter.append(this.quote).append(Long.toString(value)).append(this.quote).append(this.separator);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(long)
+     */
+    @Override
+    public void appendCell(final double value) throws IOException {
+        this.outputWriter.append(this.quote).append(Double.toString(value)).append(this.quote).append(this.separator);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(java.util.Date)
+     */
+    @Override
+    public void appendCell(final Date value) throws IOException {
+        this.outputWriter.append(this.quote);
+        if (value != null) {
+            final String date = this.df.format(value);
+            this.outputWriter.append(date.replace(this.quote, this.escape));
+        }
+        this.outputWriter.append(this.quote).append(this.separator);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendNewLine()
+     */
+    @Override
+    public void appendNewLine() throws IOException {
+        this.outputWriter.append(this.newLine);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendNewLine(java.lang.String[])
+     */
+    @Override
+    public void appendNewLine(final String... cells) throws IOException {
+        if (cells != null) {
+            for (final String cell : cells) {
+                this.outputWriter.append(this.quote);
+                if (cell != null) {
+                    this.outputWriter.append(cell.replace(this.quote, this.escape));
+                }
+                this.outputWriter.append(this.quote).append(this.separator);
+            }
+        }
+        this.outputWriter.append(this.newLine);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(java.lang.String, boolean, java.lang.String)
+     */
+    @Override
+    public void appendCell(final String value, final boolean isHeader, final String comment) throws IOException {
+        // No support for comment or styling in CSV... ignore the parameters !
+        this.appendCell(value);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(long, boolean, java.lang.String)
+     */
+    @Override
+    public void appendCell(final long value, final boolean isHeader, final String comment) throws IOException {
+        // No support for comment or styling in CSV... ignore the parameters !
+        this.appendCell(value);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(double, boolean, java.lang.String)
+     */
+    @Override
+    public void appendCell(final double value, final boolean isHeader, final String comment) throws IOException {
+        // No support for comment or styling in CSV... ignore the parameters !
+        this.appendCell(value);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableWriter#appendCell(java.util.Date, boolean, java.lang.String)
+     */
+    @Override
+    public void appendCell(final Date value, final boolean isHeader, final String comment) throws IOException {
+        // No support for comment or styling in CSV... ignore the parameters !
+        this.appendCell(value);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see io.table.api.ITableWriter#appendNewHeaderLine(java.lang.String[])
+     */
+    @Override
+    public void appendNewHeaderLine(final String... cells) throws IOException {
+        // No support for styling in CSV... ignore the parameters !
+        this.appendNewLine(cells);
+    }
 
 }

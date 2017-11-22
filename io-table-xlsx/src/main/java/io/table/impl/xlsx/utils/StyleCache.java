@@ -53,18 +53,19 @@ public final class StyleCache {
                     + "<xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\" />" //$NON-NLS-1$
                     + "<xf numFmtId=\"0\" fontId=\"1\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyFont=\"true\" />" //$NON-NLS-1$
                     + "<xf numFmtId=\"164\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyNumberFormat=\"true\" />" //$NON-NLS-1$
+                    + "<xf numFmtId=\"164\" fontId=\"1\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyFont=\"true\" applyNumberFormat=\"true\" />" //$NON-NLS-1$
                     + "</cellXfs>" //$NON-NLS-1$
                     + "</styleSheet>"; //$NON-NLS-1$
 
     /**
      * Method to write the content of the style cache.
-     * 
+     *
      * @param output
-     *            the outputstream where to write.
+     *            the output stream where to write.
      * @throws IOException
      *             Any I/O error.
      */
-    public void writeStyleContent(final OutputStream output) throws IOException {
+    public void write(final OutputStream output) throws IOException {
         output.write(StyleCache.STYLES.getBytes(StandardCharsets.UTF_8));
     }
 }

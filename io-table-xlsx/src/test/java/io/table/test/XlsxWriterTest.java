@@ -20,9 +20,6 @@
  */
 package io.table.test;
 
-import io.table.api.ITableWriter;
-import io.table.impl.xlsx.TableIoXlsxUtils;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +28,9 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import io.table.api.ITableWriter;
+import io.table.impl.xlsx.TableIoXlsxUtils;
+
 /**
  * Test class.
  *
@@ -38,26 +38,26 @@ import org.junit.Test;
  */
 public final class XlsxWriterTest {
 
-	/**
-	 * Test method for a simple output.
-	 *
-	 * @throws IOException
-	 *             any I/O error.
-	 */
-	@Test
-	public void testSimpleOutput() throws IOException {
-		final File out = new File("./test.xlsx");
-		out.createNewFile();
-		try (final OutputStream output = new FileOutputStream(out)) {
+    /**
+     * Test method for a simple output.
+     *
+     * @throws IOException
+     *             any I/O error.
+     */
+    @Test
+    public void testSimpleOutput() throws IOException {
+        final File out = new File("./test.xlsx");
+        out.createNewFile();
+        try (final OutputStream output = new FileOutputStream(out)) {
 
-			final ITableWriter writer = TableIoXlsxUtils.createWriter();
-			writer.initialize(output);
-			writer.appendNewLine("a", "b", "c");
-			writer.appendNewLine();
-			writer.appendCell("foo");
-			writer.appendCell(12345);
-			writer.appendCell(new Date());
-			writer.close();
-		}
-	}
+            final ITableWriter writer = TableIoXlsxUtils.createWriter();
+            writer.initialize(output);
+            writer.appendNewHeaderLine("a", "b", "c");
+            writer.appendNewLine();
+            writer.appendCell("foo");
+            writer.appendCell(12345);
+            writer.appendCell(new Date());
+            writer.close();
+        }
+    }
 }

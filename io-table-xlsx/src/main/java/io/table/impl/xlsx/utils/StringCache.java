@@ -78,7 +78,7 @@ public final class StringCache {
                     + this.cacheSize + "\" uniqueCount=\"" + this.cacheSize + "\">";
             output.write(header.getBytes(StandardCharsets.UTF_8));
             for (final String str : this.cacheLst) {
-                final String data = "<si><t>" + str + "</t></si>";
+                final String data = "<si><t>" + StringEscapeUtils.escapeString(str) + "</t></si>";
                 output.write(data.getBytes(StandardCharsets.UTF_8));
             }
             output.write("</sst>".getBytes(StandardCharsets.UTF_8));
