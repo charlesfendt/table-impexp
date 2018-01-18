@@ -20,11 +20,25 @@
  */
 package io.table.api;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * Interface for the reader class.
  *
  * @author charles
  */
-public interface ITableReader {
+public interface ITableReader extends Closeable {
+
+    /**
+     * Initialization method. The goal is to prepare the input stream for the import.
+     *
+     * @param input
+     *            Input stream to wrap.
+     * @throws IOException
+     *             Any I/O error.
+     */
+    void initialize(final InputStream input) throws IOException;
 
 }
