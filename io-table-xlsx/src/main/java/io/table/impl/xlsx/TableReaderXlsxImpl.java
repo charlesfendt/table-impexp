@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -110,5 +111,35 @@ public final class TableReaderXlsxImpl implements ITableReader {
             }
             return output.toByteArray();
         }
+    }
+
+    @Override
+    public boolean nextRow() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public int getColumnCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public String getCellAsString(final int columnId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Number getCellAsNumber(final int columnId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Date getCellAsDate(final int columnId) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

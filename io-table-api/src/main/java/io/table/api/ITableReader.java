@@ -23,6 +23,7 @@ package io.table.api;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * Interface for the reader class.
@@ -32,7 +33,8 @@ import java.io.InputStream;
 public interface ITableReader extends Closeable {
 
     /**
-     * Initialization method. The goal is to prepare the input stream for the import.
+     * Initialization method. The goal is to prepare the input stream for the
+     * import.
      *
      * @param input
      *            Input stream to wrap.
@@ -41,4 +43,48 @@ public interface ITableReader extends Closeable {
      */
     void initialize(final InputStream input) throws IOException;
 
+    /**
+     * Method to change the current row to the next available row.
+     * 
+     * @return False if there is no more rows in the input.
+     */
+    boolean nextRow();
+
+    /**
+     * Getter method.
+     * 
+     * @return The amount of column in the current row. If the count is unknown
+     *         (E.g. no current row), the method will return -1.
+     */
+    int getColumnCount();
+
+    /**
+     * Getter method.
+     * 
+     * @param columnId
+     *            ID of the column
+     * @return Content of the cell defined by the column ID in the current row. The
+     *         method will return null if the column does not exists.
+     */
+    String getCellAsString(final int columnId);
+
+    /**
+     * Getter method.
+     * 
+     * @param columnId
+     *            ID of the column
+     * @return Content of the cell defined by the column ID in the current row. The
+     *         method will return null if the column does not exists.
+     */
+    Number getCellAsNumber(final int columnId);
+
+    /**
+     * Getter method.
+     * 
+     * @param columnId
+     *            ID of the column
+     * @return Content of the cell defined by the column ID in the current row. The
+     *         method will return null if the column does not exists.
+     */
+    Date getCellAsDate(final int columnId);
 }
