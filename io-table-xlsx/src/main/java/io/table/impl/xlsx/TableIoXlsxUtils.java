@@ -20,6 +20,7 @@
  */
 package io.table.impl.xlsx;
 
+import io.table.api.ITableReader;
 import io.table.api.ITableWriter;
 
 /**
@@ -43,6 +44,15 @@ public final class TableIoXlsxUtils {
 	 */
 	public static ITableWriter createWriter() {
 		return new TableWriterXlsxImpl("io.table", "1.0", "data");
+	}
+	
+	/**
+	 * Creator method for the XLSX implementation of the ITableReader service.
+	 *
+	 * @return a new instance of the reader implementation.
+	 */
+	public static ITableReader createReader() {
+		return new TableReaderXlsxImpl();
 	}
 	
 }
