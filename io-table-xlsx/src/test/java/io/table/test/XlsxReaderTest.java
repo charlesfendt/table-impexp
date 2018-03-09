@@ -109,4 +109,27 @@ public final class XlsxReaderTest {
             reader.close();
         }
     }
+
+    /**
+     * Test method for a simple output.
+     *
+     * @throws IOException
+     *             any I/O error.
+     */
+    @Test
+    public void testTour() throws IOException {
+        final File in = new File("./9999_20180309_TPP.xlsx");
+        try (final FileInputStream output = new FileInputStream(in)) {
+
+            final ITableReader reader = TableIoXlsxUtils.createReader();
+            reader.initialize(output);
+            while (reader.nextRow()) {
+                for (int i = 1; i < reader.getColumnCount(); i++) {
+                    System.out.print(reader.getCellAsString(i) + ' ');
+                }
+                System.out.println();
+            }
+            reader.close();
+        }
+    }
 }
