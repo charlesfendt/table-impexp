@@ -80,4 +80,33 @@ public final class XlsxReaderTest {
             reader.close();
         }
     }
+
+    /**
+     * Test method for a simple output.
+     *
+     * @throws IOException
+     *             any I/O error.
+     */
+    @Test
+    public void testStringEncoding() throws IOException {
+        final File in = new File("./test2.xlsx");
+        try (final FileInputStream output = new FileInputStream(in)) {
+
+            final ITableReader reader = TableIoXlsxUtils.createReader();
+            reader.initialize(output);
+
+            for (int i = 1; i <= 5; i++) {
+                if (reader.nextRow()) {
+                    if (i == 2) {
+                        Assert.assertEquals(1, reader.getColumnCount());
+                        Assert.assertEquals("üüü", reader.getCellAsString(1));
+                    }
+                } else {
+                    Assert.fail("Wrong number of rows");
+                }
+            }
+
+            reader.close();
+        }
+    }
 }
