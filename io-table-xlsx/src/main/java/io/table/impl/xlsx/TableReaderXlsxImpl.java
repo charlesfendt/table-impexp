@@ -180,8 +180,15 @@ public final class TableReaderXlsxImpl implements ITableReader {
      */
     @Override
     public Date getCellAsDate(final int columnId) {
-        // FIXME
-        return null;
+        try {
+            final Value val = this.currentRow.getValues()
+                    .get(RowCellUtils.colIndexToString(columnId) + this.currentRow.getIndex());
+            final Double value = Double.parseDouble(val.getVal().toString());
+            final double curVal = ((value * 86_400_000.0d) - (25569.0d * 86_400_000.0d));
+            return new Date((long) curVal);
+        } catch (final Exception ex) {
+            return null;
+        }
     }
 
     /*

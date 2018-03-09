@@ -64,7 +64,7 @@ public final class XlsxReaderTest {
                         Assert.assertEquals(3, reader.getColumnCount());
                         Assert.assertEquals("foo", reader.getCellAsString(1));
                         Assert.assertEquals(12345.0, reader.getCellAsNumber(2)); // FIXME
-                        // Assert.assertEquals(12345, reader.getCellAsDate(3)); FIXME
+                        Assert.assertEquals(1520494932000l, reader.getCellAsDate(3).getTime());
                     } else if (i == 4) {
                         Assert.assertEquals(0, reader.getColumnCount());
                         Assert.assertEquals(null, reader.getCellAsString(2));

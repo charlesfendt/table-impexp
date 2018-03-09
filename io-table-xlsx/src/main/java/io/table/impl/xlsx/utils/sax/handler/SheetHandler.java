@@ -25,6 +25,8 @@ public class SheetHandler extends DefaultHandler {
     private boolean isString;
     /** TRUE if currently a number is parsed. */
     private boolean isNumber;
+    /** TRUE if currently a date is parsed. */
+    private boolean isDate;
     /** The current cell value as string. */
     private String cellValue;
 
@@ -82,6 +84,7 @@ public class SheetHandler extends DefaultHandler {
                 break;
             case "c":
                 // start of cell
+                this.isNumber = true; // default is number?? -> seems so
                 for (int i = 0; i < atts.getLength(); i++) {
                     if ("r".equals(atts.getQName(i))) {
                         this.cellIndexValue = atts.getValue(i);
@@ -96,6 +99,9 @@ public class SheetHandler extends DefaultHandler {
                             default: // nothing to do
                                 break;
                         }
+                    } else if ("s".equals(atts.getQName(i))) {
+                        // to know if a value is a date, we have to parse styles.xml -> who did this crap??
+                        // this.isDate = true;
                     }
                 }
                 break;
@@ -152,11 +158,10 @@ public class SheetHandler extends DefaultHandler {
                 } else if (this.isNumber) {
                     this.isNumber = false;
                     this.currentValue.setDataType(EnumDataType.NUMBER);
+                } else if (this.isDate) {
+                    this.isDate = false;
+                    // this.currentValue.setVal(val);
                 }
-                // FIXME set date
-                // else if(this.isDate) {
-                //
-                // }
                 this.currentValue.setVal(this.cellValue);
                 this.cellValue = null;
                 this.inCellValue = false;
