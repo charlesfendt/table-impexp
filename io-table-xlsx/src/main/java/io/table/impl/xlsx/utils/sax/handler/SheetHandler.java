@@ -25,6 +25,8 @@ public class SheetHandler extends DefaultHandler {
     private boolean isString;
     /** TRUE if currently a number is parsed. */
     private boolean isNumber;
+    /** TRUE if currently a boolean is parsed. */
+    private boolean isBoolean;
     /** TRUE if currently a date is parsed. */
     private boolean isDate;
     /** The current cell value as string. */
@@ -91,10 +93,15 @@ public class SheetHandler extends DefaultHandler {
                     } else if ("t".equals(atts.getQName(i))) {
                         switch (atts.getValue(i)) {
                             case "s":
+                                this.isNumber = false;
                                 this.isString = true;
                                 break;
                             case "n":
                                 this.isNumber = true;
+                                break;
+                            case "b":
+                                this.isNumber = false;
+                                this.isBoolean = true;
                                 break;
                             default: // nothing to do
                                 break;
@@ -161,6 +168,12 @@ public class SheetHandler extends DefaultHandler {
                 } else if (this.isDate) {
                     this.isDate = false;
                     // this.currentValue.setVal(val);
+                } else if (this.isBoolean) {
+                    this.isBoolean = false;
+                    this.currentValue.setDataType(EnumDataType.BOOLEAN);
+                    final int booleanInt = Integer.parseInt(this.cellValue);
+                    final boolean valueBoolean = booleanInt == 1 ? true : false;
+                    this.cellValue = Boolean.toString(valueBoolean);
                 }
                 this.currentValue.setVal(this.cellValue);
                 this.cellValue = null;

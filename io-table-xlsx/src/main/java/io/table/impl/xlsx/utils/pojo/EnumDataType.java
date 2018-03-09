@@ -8,5 +8,7 @@ public enum EnumDataType {
     DATE,
     /** Number. */
     NUMBER,
+    /** Boolean. */
+    BOOLEAN,
 
 }
