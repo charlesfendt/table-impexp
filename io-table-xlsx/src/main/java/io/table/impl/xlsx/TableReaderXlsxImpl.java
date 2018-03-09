@@ -206,8 +206,4 @@ public final class TableReaderXlsxImpl implements ITableReader {
         }
     }
 
-    public enum EnumDataType {
-        STRING, DATE, NUMBER,
-    }
-
 }

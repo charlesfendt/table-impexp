@@ -3,8 +3,8 @@ package io.table.impl.xlsx.utils.sax.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.table.impl.xlsx.TableReaderXlsxImpl.EnumDataType;
 import io.table.impl.xlsx.utils.RowCellUtils;
+import io.table.impl.xlsx.utils.pojo.EnumDataType;
 import io.table.impl.xlsx.utils.pojo.Row;
 import io.table.impl.xlsx.utils.pojo.Value;
 import org.xml.sax.Attributes;

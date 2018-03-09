@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import io.table.impl.xlsx.TableReaderXlsxImpl.EnumDataType;
+import io.table.impl.xlsx.utils.pojo.EnumDataType;
 import io.table.impl.xlsx.utils.pojo.Row;
 import io.table.impl.xlsx.utils.pojo.Value;
 import io.table.impl.xlsx.utils.sax.handler.SharedStringHandler;

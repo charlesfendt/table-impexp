@@ -1,7 +1,5 @@
 package io.table.impl.xlsx.utils.pojo;
 
-import io.table.impl.xlsx.TableReaderXlsxImpl.EnumDataType;
-
 /**
  * Pojo for a value.
  *
@@ -45,7 +43,7 @@ public final class Value {
 
     /**
      * Setter.
-     * 
+     *
      * @param dataType
      *            data type of the value
      */
@@ -55,7 +53,7 @@ public final class Value {
 
     /**
      * Setter.
-     * 
+     *
      * @param val
      *            val as object
      */
@@ -65,7 +63,7 @@ public final class Value {
 
     /**
      * Setter.
-     * 
+     *
      * @param cell
      *            the current cell value index, e.g. A1
      */
