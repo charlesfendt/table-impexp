@@ -8,6 +8,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Workbook handler.
+ * 
+ * @author smarty
+ *
+ */
 public class WorkBookHandler extends DefaultHandler {
 
     /** Id. */
@@ -20,6 +26,11 @@ public class WorkBookHandler extends DefaultHandler {
     /** Mapping form key to file name. */
     private final Map<String, Sheet> availableSheets = new HashMap<>();
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     */
     @Override
     public void startElement(final String namespaceURI, final String localName, final String qName,
             final Attributes atts) {
@@ -37,6 +48,11 @@ public class WorkBookHandler extends DefaultHandler {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+     */
     @Override
     public void endElement(final String uri, final String localName, final String qName) throws SAXException {
         if ("sheet".equals(qName)) {

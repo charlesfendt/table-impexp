@@ -8,6 +8,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Relationship handler.
+ * 
+ * @author smarty
+ *
+ */
 public class RelsHandler extends DefaultHandler {
 
     /** Mapping form key to file name. */

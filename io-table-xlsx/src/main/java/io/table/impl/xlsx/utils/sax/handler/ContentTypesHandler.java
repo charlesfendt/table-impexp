@@ -7,12 +7,19 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Content type handler.
+ * 
+ * @author smarty
+ *
+ */
 public class ContentTypesHandler extends DefaultHandler {
 
     /** Mapping form key to file name. */
     private final Map<String, String> availableContents = new HashMap<>();
     /** Current identifier for file name. */
     private String identifier = null;
+    /** The value. */
     private String value = null;
 
     /*

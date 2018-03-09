@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import io.table.api.ITableReader;
 import io.table.impl.xlsx.TableIoXlsxUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -49,10 +50,30 @@ public final class XlsxReaderTest {
             final ITableReader reader = TableIoXlsxUtils.createReader();
             reader.initialize(output);
 
-            while (reader.nextRow()) {
-                System.out.println("New Row");
-                for (int i = 1; i <= reader.getColumnCount(); i++) {
-                    System.out.println(reader.getCellAsString(i));
+            for (int i = 1; i <= 5; i++) {
+                if (reader.nextRow()) {
+                    if (i == 1) {
+                        Assert.assertEquals(3, reader.getColumnCount());
+                        Assert.assertEquals("a", reader.getCellAsString(1));
+                        Assert.assertEquals("b", reader.getCellAsString(2));
+                        Assert.assertEquals("c", reader.getCellAsString(3));
+                    } else if (i == 2) {
+                        Assert.assertEquals(0, reader.getColumnCount());
+                        Assert.assertEquals(null, reader.getCellAsString(2));
+                    } else if (i == 3) {
+                        Assert.assertEquals(3, reader.getColumnCount());
+                        Assert.assertEquals("foo", reader.getCellAsString(1));
+                        Assert.assertEquals(12345.0, reader.getCellAsNumber(2)); // FIXME
+                        // Assert.assertEquals(12345, reader.getCellAsDate(3)); FIXME
+                    } else if (i == 4) {
+                        Assert.assertEquals(0, reader.getColumnCount());
+                        Assert.assertEquals(null, reader.getCellAsString(2));
+                    } else if (i == 5) {
+                        Assert.assertEquals(2, reader.getColumnCount());
+                        Assert.assertEquals("Hallo", reader.getCellAsString(2));
+                    }
+                } else {
+                    Assert.fail("Wrong number of rows");
                 }
             }
 

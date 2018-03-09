@@ -22,6 +22,7 @@ import io.table.api.ITableReader;
 import io.table.impl.xlsx.utils.RowCellUtils;
 import io.table.impl.xlsx.utils.pojo.Row;
 import io.table.impl.xlsx.utils.pojo.Value;
+import io.table.impl.xlsx.utils.sax.handler.ContentTypesHandler;
 import io.table.impl.xlsx.utils.sax.handler.SharedStringHandler;
 import io.table.impl.xlsx.utils.sax.handler.SheetHandler;
 
@@ -90,28 +91,31 @@ public final class TableReaderXlsxImpl implements ITableReader {
         }
 
         try {
-
             final SAXParserFactory factory = SAXParserFactory.newInstance();
             final SAXParser saxParser = factory.newSAXParser();
 
+            // verify that we have a description file !
+            final File contentDesc = this.tmps.get("[Content_Types].xml");
+            if (contentDesc == null) {
+                throw new IOException(new IllegalArgumentException());
+            }
+
+            // parse contentsDesc
+            final ContentTypesHandler contentTypesHandler = new ContentTypesHandler();
+            saxParser.parse(contentDesc, contentTypesHandler);
+            final Map<String, String> content = contentTypesHandler.getAvailableContents();
+            // FIXME use content and rels file to select the correct files
+
             final SharedStringHandler sharedStringHandler = new SharedStringHandler();
-            saxParser.parse(
-                    this.getClass().getClassLoader().getResourceAsStream("./test.xlsx.unzipped/xl/sharedStrings.xml"),
-                    sharedStringHandler);
+            saxParser.parse(this.tmps.get("xl/sharedStrings.xml"), sharedStringHandler);
 
             final SheetHandler handler = new SheetHandler(sharedStringHandler.getMappingTable());
-            saxParser.parse(this.getClass().getClassLoader()
-                    .getResourceAsStream("./test.xlsx.unzipped/xl/worksheets/sheet1.xml"), handler);
+            saxParser.parse(this.tmps.get("xl/worksheets/sheet1.xml"), handler);
             this.rows = handler.getRows();
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
-        // verify that we have a description file !
-        final File contentDesc = this.tmps.get("[Content_Types].xml");
-        if (contentDesc == null) {
-            throw new IOException(new IllegalArgumentException());
-        }
         // final byte[] contentDescBytes = TableReaderXlsxImpl.readFile(contentDesc);
         // final String contentDescStr = EncodingDetectionHelper.doRawStream(contentDescBytes);
         //

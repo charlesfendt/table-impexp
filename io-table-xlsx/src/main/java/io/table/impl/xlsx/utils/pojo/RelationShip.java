@@ -1,7 +1,7 @@
 package io.table.impl.xlsx.utils.pojo;
 
 /**
- * Relationship
+ * Relationship pojo.
  *
  * @author smarty
  *
@@ -34,7 +34,7 @@ public class RelationShip {
 
     /**
      * Getter.
-     * 
+     *
      * @return id
      */
     public String getrId() {
@@ -43,7 +43,7 @@ public class RelationShip {
 
     /**
      * Getter.
-     * 
+     *
      * @return type
      */
     public String getType() {
@@ -52,7 +52,7 @@ public class RelationShip {
 
     /**
      * Getter.
-     * 
+     *
      * @return target
      */
     public String getTarget() {

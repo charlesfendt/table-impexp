@@ -11,19 +11,35 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Handler for a single sheet of excel file.
+ *
+ * @author smarty
+ *
+ */
 public class SheetHandler extends DefaultHandler {
 
+    /** TRUE if currently in cell value. */
     private boolean inCellValue;
+    /** TRUE if currently a string is parsed. */
     private boolean isString;
+    /** TRUE if currently a number is parsed. */
     private boolean isNumber;
+    /** The current cell value as string. */
     private String cellValue;
 
+    /** The current matrix index, e.g. A1. */
     private String cellIndexValue;
+    /** The map of shared string, from the shared string reading, null if not available. */
     private final Map<Integer, String> sharedStrings;
 
+    /** The rows. */
     private final Map<Integer, Row> rows = new HashMap<>();
+    /** The current row. */
     private Row currentRow = null;
+    /** The current value. */
     private Value currentValue = null;
+    /** The current counter. */
     private int rowCounter = 0;
 
     /**
@@ -105,7 +121,10 @@ public class SheetHandler extends DefaultHandler {
                 break;
             case "row":
                 // end of row
-                this.currentRow.setColumnCount(RowCellUtils.stringToColIndex(this.cellIndexValue));
+                if (this.cellIndexValue != null) {
+                    this.currentRow.setColumnCount(RowCellUtils.stringToColIndex(this.cellIndexValue));
+                }
+                this.cellIndexValue = null;
                 break;
             case "c":
                 // end of cell
@@ -113,6 +132,7 @@ public class SheetHandler extends DefaultHandler {
                 this.currentValue.setCell(this.cellIndexValue);
                 break;
             case "v":
+                // end of value
                 this.currentValue = new Value();
                 if (this.isString) {
                     this.isString = false;
@@ -125,18 +145,20 @@ public class SheetHandler extends DefaultHandler {
                                 this.cellValue = value;
                             }
                         } catch (final Exception e) {
-                            // LOG me
+                            // FIXME LOG me
                             return;
                         }
                     }
                 } else if (this.isNumber) {
-                    // FIXME set number and date
                     this.isNumber = false;
                     this.currentValue.setDataType(EnumDataType.NUMBER);
                 }
+                // FIXME set date
+                // else if(this.isDate) {
+                //
+                // }
                 this.currentValue.setVal(this.cellValue);
                 this.cellValue = null;
-                // end of value
                 this.inCellValue = false;
                 break;
             default: // do nothing
