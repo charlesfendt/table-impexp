@@ -45,10 +45,10 @@ public final class XlsxReaderTest {
     @Test
     public void testSimpleInput() throws IOException {
         final File in = new File("./test.xlsx");
-        try (final FileInputStream output = new FileInputStream(in)) {
+        try (final FileInputStream input = new FileInputStream(in)) {
 
             final ITableReader reader = TableIoXlsxUtils.createReader();
-            reader.initialize(output);
+            reader.initialize(input);
 
             for (int i = 1; i <= 5; i++) {
                 if (reader.nextRow()) {
