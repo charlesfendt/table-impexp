@@ -21,12 +21,10 @@
 package io.table.test;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Date;
 
-import io.table.api.ITableWriter;
+import io.table.api.ITableReader;
 import io.table.impl.xlsx.TableIoXlsxUtils;
 import org.junit.Test;
 
@@ -35,7 +33,7 @@ import org.junit.Test;
  *
  * @author charles
  */
-public final class XlsxWriterTest {
+public final class XlsxReaderTest {
 
     /**
      * Test method for a simple output.
@@ -44,19 +42,21 @@ public final class XlsxWriterTest {
      *             any I/O error.
      */
     @Test
-    public void testSimpleOutput() throws IOException {
-        final File out = new File("./testWrite.xlsx");
-        out.createNewFile();
-        try (final OutputStream output = new FileOutputStream(out)) {
+    public void testSimpleInput() throws IOException {
+        final File in = new File("./test.xlsx");
+        try (final FileInputStream output = new FileInputStream(in)) {
 
-            final ITableWriter writer = TableIoXlsxUtils.createWriter();
-            writer.initialize(output);
-            writer.appendNewHeaderLine("a", "b", "c");
-            writer.appendNewLine();
-            writer.appendCell("foo");
-            writer.appendCell(12345);
-            writer.appendCell(new Date());
-            writer.close();
+            final ITableReader reader = TableIoXlsxUtils.createReader();
+            reader.initialize(output);
+
+            while (reader.nextRow()) {
+                System.out.println("New Row");
+                for (int i = 1; i <= reader.getColumnCount(); i++) {
+                    System.out.println(reader.getCellAsString(i));
+                }
+            }
+
+            reader.close();
         }
     }
 }

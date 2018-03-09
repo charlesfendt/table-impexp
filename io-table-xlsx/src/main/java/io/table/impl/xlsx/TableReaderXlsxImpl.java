@@ -4,9 +4,7 @@
 package io.table.impl.xlsx;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,12 +12,18 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import io.table.api.ITableReader;
-import io.table.impl.xlsx.utils.EncodingDetectionHelper;
+import io.table.impl.xlsx.utils.RowCellUtils;
+import io.table.impl.xlsx.utils.pojo.Row;
+import io.table.impl.xlsx.utils.pojo.Value;
+import io.table.impl.xlsx.utils.sax.handler.SharedStringHandler;
+import io.table.impl.xlsx.utils.sax.handler.SheetHandler;
 
 /**
  * Implementation of the reader interface.
@@ -34,8 +38,13 @@ public final class TableReaderXlsxImpl implements ITableReader {
     /** List of temporary file to delete. */
     private final Map<String, File> tmps = new HashMap<>();
 
+    private Map<Integer, Row> rows;
+    private Row currentRow;
+    private int rowCounter = 1;
+
     /*
      * (non-Javadoc)
+     *
      * @see java.io.Closeable#close()
      */
     @Override
@@ -49,6 +58,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
 
     /*
      * (non-Javadoc)
+     *
      * @see io.table.api.ITableReader#initialize(java.io.InputStream)
      */
     @Override
@@ -79,67 +89,112 @@ public final class TableReaderXlsxImpl implements ITableReader {
             }
         }
 
+        try {
+
+            final SAXParserFactory factory = SAXParserFactory.newInstance();
+            final SAXParser saxParser = factory.newSAXParser();
+
+            final SharedStringHandler sharedStringHandler = new SharedStringHandler();
+            saxParser.parse(
+                    this.getClass().getClassLoader().getResourceAsStream("./test.xlsx.unzipped/xl/sharedStrings.xml"),
+                    sharedStringHandler);
+
+            final SheetHandler handler = new SheetHandler(sharedStringHandler.getMappingTable());
+            saxParser.parse(this.getClass().getClassLoader()
+                    .getResourceAsStream("./test.xlsx.unzipped/xl/worksheets/sheet1.xml"), handler);
+            this.rows = handler.getRows();
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
         // verify that we have a description file !
         final File contentDesc = this.tmps.get("[Content_Types].xml");
         if (contentDesc == null) {
             throw new IOException(new IllegalArgumentException());
         }
-        final byte[] contentDescBytes = TableReaderXlsxImpl.readFile(contentDesc);
-        final String contentDescStr = EncodingDetectionHelper.doRawStream(contentDescBytes);
-
-        final Pattern sheetPatter = Pattern.compile(
-                "<[^>]*application/vnd\\.openxmlformats-officedocument\\.spreadsheetml\\.worksheet\\+xml[^>]*>");
+        // final byte[] contentDescBytes = TableReaderXlsxImpl.readFile(contentDesc);
+        // final String contentDescStr = EncodingDetectionHelper.doRawStream(contentDescBytes);
+        //
+        // final Pattern sheetPatter = Pattern.compile(
+        // "<[^>]*application/vnd\\.openxmlformats-officedocument\\.spreadsheetml\\.worksheet\\+xml[^>]*>");
     }
 
-    /**
-     * Method to fully read a file.
+    /*
+     * (non-Javadoc)
      *
-     * @param file
-     *            The file to read.
-     * @return The raw data of the file.
-     * @throws IOException
-     *             Any I/O error.
+     * @see io.table.api.ITableReader#nextRow()
      */
-    private static byte[] readFile(final File file) throws IOException {
-        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
-                final InputStream input = new FileInputStream(file)) {
-            final byte[] buffer = new byte[TableReaderXlsxImpl.BUFFER_SIZE];
-            int readsize = input.read(buffer);
-            while (readsize > 0) {
-                output.write(buffer, 0, readsize);
-                readsize = input.read(buffer);
-            }
-            return output.toByteArray();
+    @Override
+    public boolean nextRow() {
+        this.currentRow = this.rows.get(this.rowCounter);
+        return this.rows.containsKey(this.rowCounter++);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableReader#getColumnCount()
+     */
+    @Override
+    public int getColumnCount() {
+        return this.currentRow.getColumnCount();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableReader#getCellAsString(int)
+     */
+    @Override
+    public String getCellAsString(final int columnId) {
+        final Value val = this.currentRow.getValues()
+                .get(RowCellUtils.colIndexToString(columnId) + this.currentRow.getIndex());
+        if (val == null) {
+            return null;
+        }
+        return val.getVal().toString();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableReader#getCellAsNumber(int)
+     */
+    @Override
+    public Number getCellAsNumber(final int columnId) {
+        final Value val = this.currentRow.getValues()
+                .get(RowCellUtils.colIndexToString(columnId) + this.currentRow.getIndex());
+        return Double.parseDouble(val.getVal().toString());
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableReader#getCellAsDate(int)
+     */
+    @Override
+    public Date getCellAsDate(final int columnId) {
+        // FIXME
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see io.table.api.ITableReader#nextRowInt()
+     */
+    @Override
+    public int nextRowInt() {
+        this.currentRow = this.rows.get(this.rowCounter);
+        if (this.rows.containsKey(this.rowCounter++)) {
+            return this.rowCounter;
+        } else {
+            return -1;
         }
     }
 
-    @Override
-    public boolean nextRow() {
-        // TODO Auto-generated method stub
-        return false;
+    public enum EnumDataType {
+        STRING, DATE, NUMBER,
     }
 
-    @Override
-    public int getColumnCount() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public String getCellAsString(final int columnId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Number getCellAsNumber(final int columnId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Date getCellAsDate(final int columnId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }
