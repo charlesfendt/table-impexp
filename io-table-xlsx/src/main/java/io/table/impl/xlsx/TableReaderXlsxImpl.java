@@ -38,9 +38,11 @@ public final class TableReaderXlsxImpl implements ITableReader {
 
     /** List of temporary file to delete. */
     private final Map<String, File> tmps = new HashMap<>();
-
+    /** The rows. */
     private Map<Integer, Row> rows;
+    /** Current row, to navigate. */
     private Row currentRow;
+    /** Row counter, starting with 1. */
     private int rowCounter = 1;
 
     /*
