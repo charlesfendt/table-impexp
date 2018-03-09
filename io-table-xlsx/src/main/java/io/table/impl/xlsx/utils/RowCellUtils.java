@@ -1,5 +1,8 @@
 package io.table.impl.xlsx.utils;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Utility class for rows and cells.
  *
@@ -50,5 +53,30 @@ public final class RowCellUtils {
             }
         }
         return colIndex;
+    }
+
+    /**
+     * Getter for the microsoft format days.
+     *
+     * @param value
+     *            the date to convert
+     * @return the number of days since 1.1.1900 +2
+     */
+    public static double getDays(final Date value) {
+        return (value.getTime() / 86_400_000.0d) + 25569.0d;
+    }
+
+    /**
+     * Converts the microsoft days format to a date.
+     *
+     * @param value
+     *            the microsoft days format as double
+     * @return the date
+     */
+    public static Date getDateFromDays(final double value) {
+        final long curVal = Math.round(((value - 25569.0d) * 86_400_000.0d) / 1000.d) * 1000L;
+        final Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(curVal);
+        return cal.getTime();
     }
 }

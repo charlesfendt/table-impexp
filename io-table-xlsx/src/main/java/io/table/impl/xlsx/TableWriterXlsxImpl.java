@@ -291,7 +291,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         ++this.indexCol;
 
         // number of days since 01.01.1900 + 2
-        final String val = value == null ? "" : Double.toString((value.getTime() / 86_400_000.0d) + 25569.0d);
+        final String val = value == null ? "" : Double.toString(RowCellUtils.getDays(value));
         final String style = isHeader ? " s=\"3\"" : " s=\"2\"";
         final String ref = RowCellUtils.colIndexToString(this.indexCol) + Integer.toString(this.indexRow);
 

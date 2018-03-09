@@ -1,5 +1,8 @@
 package io.table.test;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import io.table.impl.xlsx.utils.RowCellUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,6 +26,18 @@ public class RowCellUtilsTests {
             final String colIndexToString = RowCellUtils.colIndexToString(i);
             Assert.assertEquals(i, RowCellUtils.stringToColIndex(colIndexToString));
         }
+    }
+
+    /** Test method. */
+    @Test
+    public void testDate() {
+        final Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MILLISECOND, 0);
+        final Date dateVal = cal.getTime();
+        final double days = RowCellUtils.getDays(dateVal);
+        final Date dateFromDays = RowCellUtils.getDateFromDays(days);
+        Assert.assertEquals(dateFromDays.getTime(), dateVal.getTime());
+
     }
 
 }

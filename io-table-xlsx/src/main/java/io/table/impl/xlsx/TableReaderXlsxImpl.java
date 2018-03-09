@@ -183,9 +183,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
         try {
             final Value val = this.currentRow.getValues()
                     .get(RowCellUtils.colIndexToString(columnId) + this.currentRow.getIndex());
-            final Double value = Double.parseDouble(val.getVal().toString());
-            final double curVal = ((value * 86_400_000.0d) - (25569.0d * 86_400_000.0d));
-            return new Date((long) curVal);
+            return RowCellUtils.getDateFromDays(Double.parseDouble(val.getVal().toString()));
         } catch (final Exception ex) {
             return null;
         }
