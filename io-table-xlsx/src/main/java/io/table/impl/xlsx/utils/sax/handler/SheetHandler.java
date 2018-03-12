@@ -156,7 +156,7 @@ public class SheetHandler extends DefaultHandler {
                 break;
             case "c":
                 // end of cell
-                // adding missing cells if required
+                // adding empty cells if required
                 while (this.columnCounter < RowCellUtils.stringToColIndex(this.cellIndexValue)) {
                     final Value emptyValue = new Value();
                     emptyValue.setVal("");
@@ -166,8 +166,17 @@ public class SheetHandler extends DefaultHandler {
                     this.currentRow.getValues().put(localIndex, emptyValue);
                     this.columnCounter++;
                 }
+
+                // add value if this not required element is missing
+                if (this.currentValue == null) {
+                    this.currentValue = new Value();
+                    this.currentValue.setVal("");
+                    this.currentValue.setDataType(EnumDataType.STRING);
+                }
+
                 this.currentRow.getValues().put(this.cellIndexValue, this.currentValue);
                 this.currentValue.setCell(this.cellIndexValue);
+                this.currentValue = null;
                 this.columnCounter++;
                 break;
             case "v":
