@@ -59,7 +59,6 @@ public class SharedStringHandler extends DefaultHandler {
      */
     @Override
     public void characters(final char[] ch, final int start, final int length) {
-
         if (this.inSharedString) {
             this.sharedStringValue = new String(ch, start, length);
         }
