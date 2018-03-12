@@ -47,6 +47,7 @@ public class SharedStringHandler extends DefaultHandler {
         if (qName.equals("t")) {
             this.inSharedString = false;
             this.sharedStrings.put(this.count, this.sharedStringValue);
+            this.sharedStringValue = "";
             this.count++;
         }
     }
@@ -67,7 +68,7 @@ public class SharedStringHandler extends DefaultHandler {
 
     /**
      * Getter for the string mapping table
-     * 
+     *
      * @return the string mapping table
      */
     public Map<Integer, String> getMappingTable() {
