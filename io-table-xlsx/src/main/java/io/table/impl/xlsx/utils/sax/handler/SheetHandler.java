@@ -23,6 +23,10 @@ public class SheetHandler extends DefaultHandler {
     private boolean inCellValue;
     /** TRUE if currently a string is parsed. */
     private boolean isString;
+    /** TRUE if currently a inline string is parsed. */
+    private boolean isInlineString;
+    /** TRUE if currently an error is parsed. */
+    private boolean isError;
     /** TRUE if currently a number is parsed. */
     private boolean isNumber;
     /** TRUE if currently a boolean is parsed. */
@@ -45,6 +49,8 @@ public class SheetHandler extends DefaultHandler {
     private Value currentValue = null;
     /** The current counter. */
     private int rowCounter = 0;
+    /** The current column counter. */
+    private int columnCounter = 1;
 
     /**
      * Constructor.
@@ -92,9 +98,17 @@ public class SheetHandler extends DefaultHandler {
                         this.cellIndexValue = atts.getValue(i);
                     } else if ("t".equals(atts.getQName(i))) {
                         switch (atts.getValue(i)) {
+                            case "e":
+                                this.isError = true;
+                                this.isNumber = false;
+                                break;
                             case "s":
                                 this.isNumber = false;
                                 this.isString = true;
+                                break;
+                            case "inlineStr":
+                                this.isNumber = false;
+                                this.isInlineString = true;
                                 break;
                             case "n":
                                 this.isNumber = true;
@@ -138,11 +152,23 @@ public class SheetHandler extends DefaultHandler {
                     this.currentRow.setColumnCount(RowCellUtils.stringToColIndex(this.cellIndexValue));
                 }
                 this.cellIndexValue = null;
+                this.columnCounter = 1;
                 break;
             case "c":
                 // end of cell
+                // adding missing cells if required
+                while (this.columnCounter < RowCellUtils.stringToColIndex(this.cellIndexValue)) {
+                    final Value emptyValue = new Value();
+                    emptyValue.setVal("");
+                    emptyValue.setDataType(EnumDataType.STRING);
+                    final String localIndex = RowCellUtils.colIndexToString(this.columnCounter) + this.rowCounter;
+                    emptyValue.setCell(localIndex);
+                    this.currentRow.getValues().put(localIndex, emptyValue);
+                    this.columnCounter++;
+                }
                 this.currentRow.getValues().put(this.cellIndexValue, this.currentValue);
                 this.currentValue.setCell(this.cellIndexValue);
+                this.columnCounter++;
                 break;
             case "v":
                 // end of value
@@ -162,6 +188,9 @@ public class SheetHandler extends DefaultHandler {
                             return;
                         }
                     }
+                } else if (this.isInlineString) {
+                    this.isInlineString = false;
+                    this.currentValue.setDataType(EnumDataType.STRING);
                 } else if (this.isNumber) {
                     this.isNumber = false;
                     this.currentValue.setDataType(EnumDataType.NUMBER);
@@ -174,6 +203,10 @@ public class SheetHandler extends DefaultHandler {
                     final int booleanInt = Integer.parseInt(this.cellValue);
                     final boolean valueBoolean = booleanInt == 1 ? true : false;
                     this.cellValue = Boolean.toString(valueBoolean);
+                } else if (this.isError) {
+                    this.isError = false;
+                    this.currentValue.setDataType(EnumDataType.ERROR);
+                    this.cellValue = ""; // in case of error set value to empty FIXME??
                 }
                 this.currentValue.setVal(this.cellValue);
                 this.cellValue = null;

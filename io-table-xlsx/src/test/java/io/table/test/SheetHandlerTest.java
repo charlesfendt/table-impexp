@@ -97,7 +97,13 @@ public class SheetHandlerTest {
         Assert.assertEquals(5, row5.getIndex());
 
         final Map<String, Value> valuesRow5 = row5.getValues();
-        Assert.assertEquals(1, valuesRow5.size());
+        Assert.assertEquals(2, valuesRow5.size());
+
+        // check not set cell A5 for empty
+        final Value valueA5 = valuesRow5.get("A5");
+        Assert.assertEquals("", valueA5.getVal());
+        Assert.assertEquals("A5", valueA5.getCell());
+
         final Value valueB5 = valuesRow5.get("B5");
         Assert.assertEquals("Hallo", valueB5.getVal());
         Assert.assertEquals(EnumDataType.STRING, valueB5.getDataType());

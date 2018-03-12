@@ -10,5 +10,7 @@ public enum EnumDataType {
     NUMBER,
     /** Boolean. */
     BOOLEAN,
+    /** Error. */
+    ERROR,
 
 }
