@@ -106,23 +106,51 @@ public final class TableReaderXlsxImpl implements ITableReader {
             final ContentTypesHandler contentTypesHandler = new ContentTypesHandler();
             saxParser.parse(contentDesc, contentTypesHandler);
             final Map<String, String> content = contentTypesHandler.getAvailableContents();
-            // FIXME use content and rels file to select the correct files
 
-            final SharedStringHandler sharedStringHandler = new SharedStringHandler();
-            saxParser.parse(this.tmps.get("xl/sharedStrings.xml"), sharedStringHandler);
+            final String locationSharedStrings = this.removeLeadingSlash(
+                    content.get("application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"));
+            final String locationWorkBook = this.removeLeadingSlash(
+                    content.get("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml")); // FIXME also use workbook to handle sheets
+            final String locationSheet = this.removeLeadingSlash(
+                    content.get("application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml")); // FIXME there can be several sheets with the
+                                                                                                               // same id
 
-            final SheetHandler handler = new SheetHandler(sharedStringHandler.getMappingTable());
-            saxParser.parse(this.tmps.get("xl/worksheets/sheet1.xml"), handler);
-            this.rows = handler.getRows();
+            // check shared string maps
+            Map<Integer, String> sharedStringMap = null;
+            if (locationSharedStrings != null) {
+                final File sharedStringsFile = this.tmps.get(locationSharedStrings);
+                if ((sharedStringsFile != null) && sharedStringsFile.exists()) {
+                    final SharedStringHandler sharedStringHandler = new SharedStringHandler();
+                    saxParser.parse(sharedStringsFile, sharedStringHandler);
+                    sharedStringMap = sharedStringHandler.getMappingTable();
+                }
+            }
+
+            // check worksheet file
+            final File sheetFile = this.tmps.get(locationSheet);
+            if ((sheetFile != null) && sheetFile.exists()) {
+                final SheetHandler handler = new SheetHandler(sharedStringMap);
+                saxParser.parse(sheetFile, handler);
+                this.rows = handler.getRows();
+            }
         } catch (final Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // FIXME logging
         }
 
-        // final byte[] contentDescBytes = TableReaderXlsxImpl.readFile(contentDesc);
-        // final String contentDescStr = EncodingDetectionHelper.doRawStream(contentDescBytes);
-        //
-        // final Pattern sheetPatter = Pattern.compile(
-        // "<[^>]*application/vnd\\.openxmlformats-officedocument\\.spreadsheetml\\.worksheet\\+xml[^>]*>");
+    }
+
+    /**
+     * Removes the first slash in string.
+     *
+     * @param value
+     *            to remove from
+     * @return the string without leading slash
+     */
+    private String removeLeadingSlash(final String value) {
+        if ((value != null) && value.startsWith("/")) {
+            return value.replaceFirst("/", "");
+        }
+        return value;
     }
 
     /*
@@ -132,6 +160,9 @@ public final class TableReaderXlsxImpl implements ITableReader {
      */
     @Override
     public boolean nextRow() {
+        if (this.rows == null) {
+            return false;
+        }
         this.currentRow = this.rows.get(this.rowCounter);
         return this.rows.containsKey(this.rowCounter++);
     }
@@ -196,6 +227,9 @@ public final class TableReaderXlsxImpl implements ITableReader {
      */
     @Override
     public int nextRowInt() {
+        if (this.rows == null) {
+            return -1;
+        }
         this.currentRow = this.rows.get(this.rowCounter);
         if (this.rows.containsKey(this.rowCounter++)) {
             return this.rowCounter;
