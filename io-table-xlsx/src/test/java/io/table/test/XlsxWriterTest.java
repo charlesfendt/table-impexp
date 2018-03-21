@@ -26,9 +26,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
-import io.table.api.ITableWriter;
-import io.table.impl.xlsx.TableIoXlsxUtils;
 import org.junit.Test;
+
+import io.table.api.ITableWriter;
+import io.table.impl.xlsx.TableWriterXlsxImpl;
 
 /**
  * Test class.
@@ -45,17 +46,32 @@ public final class XlsxWriterTest {
      */
     @Test
     public void testSimpleOutput() throws IOException {
-        final File out = new File("./testWrite.xlsx");
+        final File out = new File("C:/Users/matthaeis/Desktop/testWrite.xlsx");
         out.createNewFile();
         try (final OutputStream output = new FileOutputStream(out)) {
 
-            final ITableWriter writer = TableIoXlsxUtils.createWriter();
+            final ITableWriter writer = new TableWriterXlsxImpl("IZARMobile", "2.0", "ooo");
             writer.initialize(output);
-            writer.appendNewHeaderLine("a", "b", "c");
+            // writer.appendNewHeaderLine("a", "b", "c");
+            writer.appendCell("a", true, "Comment / a");
+            writer.appendCell("b", true, "Comment <b");
+            writer.appendCell("c", true, "Comment > c");
             writer.appendNewLine();
             writer.appendCell("foo");
             writer.appendCell(12345);
+            writer.appendCell(12345.678);
+            writer.appendNewLine();
+            writer.appendCell("777.333");
             writer.appendCell(new Date());
+            writer.appendNewLine();
+            writer.appendCell("123456");
+            writer.appendCell("123456 / ");
+            writer.appendCell("123456 <");
+            writer.appendCell("m³");
+            writer.appendCell("IZAR RADIO EXTERN RS232 / L-BUS (v62)");
+            writer.appendCell("values.volume.main (MEASUREMENT UNITS)");
+            writer.appendCell((String) null);
+
             writer.close();
         }
     }
