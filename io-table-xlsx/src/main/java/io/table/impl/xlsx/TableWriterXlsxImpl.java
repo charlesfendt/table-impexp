@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -90,6 +91,10 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         this.df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         this.applicationName = applicationName;
+        final boolean matchesVersion = Pattern.matches("[1-9]*\\.[0-9]*", applicationVersion);
+        if (!matchesVersion) {
+            throw new RuntimeException("Invalid application version");
+        }
         this.applicationVersion = applicationVersion;
 
         this.wsName = wsName;
@@ -232,7 +237,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
         final String cellStr = "<c r=\"" + ref + "\" t=\"s\"" + style + "><v>" + Integer.toString(index) + "</v></c>\n";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
-        if ((comment != null) && !comment.isEmpty()) {
+        if (comment != null && !comment.isEmpty()) {
             this.commentCache.addComment(this.indexCol - 1, this.indexRow - 1, ref, comment);
         }
     }
@@ -253,7 +258,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
         final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + Long.toString(value) + "</v></c>\n";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
-        if ((comment != null) && !comment.isEmpty()) {
+        if (comment != null && !comment.isEmpty()) {
             this.commentCache.addComment(this.indexCol - 1, this.indexRow - 1, ref, comment);
         }
     }
@@ -274,7 +279,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
         final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + Double.toString(value) + "</v></c>\n";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
-        if ((comment != null) && !comment.isEmpty()) {
+        if (comment != null && !comment.isEmpty()) {
             this.commentCache.addComment(this.indexCol - 1, this.indexRow - 1, ref, comment);
         }
     }
@@ -297,7 +302,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
         final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + val + "</v></c>\n";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
-        if ((comment != null) && !comment.isEmpty()) {
+        if (comment != null && !comment.isEmpty()) {
             this.commentCache.addComment(this.indexCol - 1, this.indexRow - 1, ref, comment);
         }
     }

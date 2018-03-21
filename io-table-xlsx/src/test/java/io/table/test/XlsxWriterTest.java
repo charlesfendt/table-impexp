@@ -46,7 +46,7 @@ public final class XlsxWriterTest {
      */
     @Test
     public void testSimpleOutput() throws IOException {
-        final File out = new File("C:/Users/matthaeis/Desktop/testWrite.xlsx");
+        final File out = new File("./testWrite.xlsx");
         out.createNewFile();
         try (final OutputStream output = new FileOutputStream(out)) {
 
