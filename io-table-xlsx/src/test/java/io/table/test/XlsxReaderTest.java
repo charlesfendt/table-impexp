@@ -24,10 +24,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import io.table.api.ITableReader;
-import io.table.impl.xlsx.TableIoXlsxUtils;
 import org.junit.Assert;
 import org.junit.Test;
+
+import io.table.api.ITableReader;
+import io.table.impl.xlsx.TableIoXlsxUtils;
 
 /**
  * Test class.
@@ -71,6 +72,48 @@ public final class XlsxReaderTest {
                     } else if (i == 5) {
                         Assert.assertEquals(2, reader.getColumnCount());
                         Assert.assertEquals("Hallo", reader.getCellAsString(2));
+                    }
+                } else {
+                    Assert.fail("Wrong number of rows");
+                }
+            }
+
+            reader.close();
+        }
+    }
+
+    /**
+     * Test method for a simple output.
+     *
+     * @throws IOException
+     *             any I/O error.
+     */
+    @Test
+    public void testReadInlineFile() throws IOException {
+        final File in = new File("./inline.xlsx");
+        try (final FileInputStream input = new FileInputStream(in)) {
+
+            final ITableReader reader = TableIoXlsxUtils.createReader();
+            reader.initialize(input);
+
+            for (int i = 1; i <= 5; i++) {
+                if (reader.nextRow()) {
+                    if (i == 1) {
+                        Assert.assertEquals(36, reader.getColumnCount());
+                        Assert.assertEquals("Medium", reader.getCellAsString(1));
+                        Assert.assertEquals("Battery lifetime", reader.getCellAsString(2));
+                        Assert.assertEquals("Billing contact - Contact#", reader.getCellAsString(3));
+                        Assert.assertEquals("ID", reader.getCellAsString(4));
+                    } else if (i == 2) {
+                        Assert.assertEquals(36, reader.getColumnCount());
+                        Assert.assertEquals("WATER", reader.getCellAsString(1));
+                        Assert.assertEquals("4015 (day)", reader.getCellAsString(2));
+                    } else if (i == 3) {
+                        Assert.assertEquals(36, reader.getColumnCount());
+                        Assert.assertEquals(null, reader.getCellAsString(3));
+                    } else if (i == 4) {
+                        Assert.assertEquals(36, reader.getColumnCount());
+                        Assert.assertEquals(null, reader.getCellAsString(3));
                     }
                 } else {
                     Assert.fail("Wrong number of rows");

@@ -119,7 +119,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
             Map<Integer, String> sharedStringMap = null;
             if (locationSharedStrings != null) {
                 final File sharedStringsFile = this.tmps.get(locationSharedStrings);
-                if ((sharedStringsFile != null) && sharedStringsFile.exists()) {
+                if (sharedStringsFile != null && sharedStringsFile.exists()) {
                     final SharedStringHandler sharedStringHandler = new SharedStringHandler();
                     saxParser.parse(sharedStringsFile, sharedStringHandler);
                     sharedStringMap = sharedStringHandler.getMappingTable();
@@ -128,7 +128,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
 
             // check worksheet file
             final File sheetFile = this.tmps.get(locationSheet);
-            if ((sheetFile != null) && sheetFile.exists()) {
+            if (sheetFile != null && sheetFile.exists()) {
                 final SheetHandler handler = new SheetHandler(sharedStringMap);
                 saxParser.parse(sheetFile, handler);
                 this.rows = handler.getRows();
@@ -147,7 +147,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
      * @return the string without leading slash
      */
     private String removeLeadingSlash(final String value) {
-        if ((value != null) && value.startsWith("/")) {
+        if (value != null && value.startsWith("/")) {
             return value.replaceFirst("/", "");
         }
         return value;
@@ -186,7 +186,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
     public String getCellAsString(final int columnId) {
         final Value val = this.currentRow.getValues()
                 .get(RowCellUtils.colIndexToString(columnId) + this.currentRow.getIndex());
-        if (val == null) {
+        if (val == null || val.getVal() == null) {
             return null;
         }
         return val.getVal().toString();

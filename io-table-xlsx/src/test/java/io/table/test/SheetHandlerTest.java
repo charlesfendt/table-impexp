@@ -5,13 +5,14 @@ import java.util.Map;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import io.table.impl.xlsx.utils.pojo.EnumDataType;
 import io.table.impl.xlsx.utils.pojo.Row;
 import io.table.impl.xlsx.utils.pojo.Value;
 import io.table.impl.xlsx.utils.sax.handler.SharedStringHandler;
 import io.table.impl.xlsx.utils.sax.handler.SheetHandler;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * Test.
@@ -111,4 +112,31 @@ public class SheetHandlerTest {
 
     }
 
+    /**
+     * Test method.
+     *
+     * @throws Exception
+     *             in case of error
+     */
+    @Test
+    public void testInlineSheet() throws Exception {
+        final SAXParserFactory factory = SAXParserFactory.newInstance();
+        final SAXParser saxParser = factory.newSAXParser();
+        final SharedStringHandler sharedStringHandler = new SharedStringHandler();
+        final SheetHandler handler = new SheetHandler(sharedStringHandler.getMappingTable());
+        saxParser.parse(this.getClass().getClassLoader().getResourceAsStream("./sheet1.xml"), handler);
+
+        // check size all rows
+        final Map<Integer, Row> rows = handler.getRows();
+        Assert.assertEquals(rows.size(), 73);
+
+        // check first row
+        final Row row1 = rows.get(1);
+        Assert.assertEquals(36, row1.getColumnCount());
+        Assert.assertEquals(1, row1.getIndex());
+        final Map<String, Value> valuesRow1 = row1.getValues();
+        Assert.assertEquals("Medium", valuesRow1.get("A1").getVal());
+        Assert.assertEquals("A1", valuesRow1.get("A1").getCell());
+        Assert.assertEquals(EnumDataType.STRING, valuesRow1.get("A1").getDataType());
+    }
 }
