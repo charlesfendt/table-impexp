@@ -110,10 +110,10 @@ public final class XlsxReaderTest {
                         Assert.assertEquals("4015 (day)", reader.getCellAsString(2));
                     } else if (i == 3) {
                         Assert.assertEquals(36, reader.getColumnCount());
-                        Assert.assertEquals(null, reader.getCellAsString(3));
+                        Assert.assertEquals("", reader.getCellAsString(3));
                     } else if (i == 4) {
                         Assert.assertEquals(36, reader.getColumnCount());
-                        Assert.assertEquals(null, reader.getCellAsString(3));
+                        Assert.assertEquals("", reader.getCellAsString(3));
                     }
                 } else {
                     Assert.fail("Wrong number of rows");

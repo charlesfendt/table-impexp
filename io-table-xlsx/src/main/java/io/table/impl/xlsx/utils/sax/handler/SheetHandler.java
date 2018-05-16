@@ -200,7 +200,11 @@ public class SheetHandler extends DefaultHandler {
                 this.is = false;
                 this.currentValue = new Value();
                 this.currentValue.setDataType(EnumDataType.STRING);
-                this.currentValue.setVal(this.cellValue);
+                if (this.cellValue == null) {
+                    this.currentValue.setVal("");
+                } else {
+                    this.currentValue.setVal(this.cellValue);
+                }
                 this.cellValue = null;
                 this.inCellValue = false;
             }
@@ -261,6 +265,7 @@ public class SheetHandler extends DefaultHandler {
     public void characters(final char[] ch, final int start, final int length) {
         if (this.inCellValue) {
             this.cellValue = new String(ch, start, length);
+            System.out.println(this.cellValue);
         }
     }
 
