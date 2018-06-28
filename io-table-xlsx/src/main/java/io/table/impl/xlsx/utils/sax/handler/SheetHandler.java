@@ -265,7 +265,6 @@ public class SheetHandler extends DefaultHandler {
     public void characters(final char[] ch, final int start, final int length) {
         if (this.inCellValue) {
             this.cellValue = new String(ch, start, length);
-            System.out.println(this.cellValue);
         }
     }
 
