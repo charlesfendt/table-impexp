@@ -3,7 +3,7 @@
 
     <groupId>io.table</groupId>
     <artifactId>io-table-parent</artifactId>
-    <version>0.3.1-SNAHSHOT</version>
+    <version>0.3.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>io-table-parent</name>
