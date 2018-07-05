@@ -4,11 +4,10 @@
 package io.table.impl.xlsx;
 
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +36,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
     private static final int BUFFER_SIZE = 1024 * 1024;
 
     /** List of temporary file to delete. */
-    private final Map<String, File> tmps = new HashMap<>();
+    private final Map<String, byte[]> tmps = new HashMap<>();
     /** The rows. */
     private Map<Integer, Row> rows;
     /** Current row, to navigate. */
@@ -53,9 +52,10 @@ public final class TableReaderXlsxImpl implements ITableReader {
     @Override
     public void close() throws IOException {
         // remove temporary files...
-        for (final Map.Entry<String, File> entry : this.tmps.entrySet()) {
-            entry.getValue().delete();
-        }
+        // for (final Map.Entry<String, InputStream> entry : this.tmps.entrySet()) {
+        // // entry.getValue().delete();
+        // entry.getValue().close();
+        // }
         this.tmps.clear();
     }
 
@@ -75,16 +75,13 @@ public final class TableReaderXlsxImpl implements ITableReader {
             ZipEntry entry = zipInput.getNextEntry();
             while (entry != null) {
                 if (!entry.isDirectory()) {
-                    // create a temporary file
-                    final File tmp = File.createTempFile("io-table", "tmp");
-                    this.tmps.put(entry.getName(), tmp);
-                    // extract file !
-                    try (OutputStream out = new FileOutputStream(tmp)) {
+                    try (final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                         readsize = zipInput.read(buffer);
                         while (readsize > 0) {
                             out.write(buffer, 0, readsize);
                             readsize = zipInput.read(buffer);
                         }
+                        this.tmps.put(entry.getName(), out.toByteArray());
                     }
                 }
                 // go to the next entry
@@ -97,10 +94,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
             final SAXParser saxParser = factory.newSAXParser();
 
             // verify that we have a description file !
-            final File contentDesc = this.tmps.get("[Content_Types].xml");
-            if (contentDesc == null) {
-                throw new IOException(new IllegalArgumentException());
-            }
+            final ByteArrayInputStream contentDesc = new ByteArrayInputStream(this.tmps.get("[Content_Types].xml"));
 
             // parse contentsDesc
             final ContentTypesHandler contentTypesHandler = new ContentTypesHandler();
@@ -118,8 +112,9 @@ public final class TableReaderXlsxImpl implements ITableReader {
             // check shared string maps
             Map<Integer, String> sharedStringMap = null;
             if (locationSharedStrings != null) {
-                final File sharedStringsFile = this.tmps.get(locationSharedStrings);
-                if (sharedStringsFile != null && sharedStringsFile.exists()) {
+                final ByteArrayInputStream sharedStringsFile = new ByteArrayInputStream(
+                        this.tmps.get(locationSharedStrings));
+                if (sharedStringsFile != null) {
                     final SharedStringHandler sharedStringHandler = new SharedStringHandler();
                     saxParser.parse(sharedStringsFile, sharedStringHandler);
                     sharedStringMap = sharedStringHandler.getMappingTable();
@@ -127,8 +122,8 @@ public final class TableReaderXlsxImpl implements ITableReader {
             }
 
             // check worksheet file
-            final File sheetFile = this.tmps.get(locationSheet);
-            if (sheetFile != null && sheetFile.exists()) {
+            final ByteArrayInputStream sheetFile = new ByteArrayInputStream(this.tmps.get(locationSheet));
+            if (sheetFile != null) {
                 final SheetHandler handler = new SheetHandler(sharedStringMap);
                 saxParser.parse(sheetFile, handler);
                 this.rows = handler.getRows();
