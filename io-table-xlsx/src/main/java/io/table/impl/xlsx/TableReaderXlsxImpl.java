@@ -71,7 +71,6 @@ public final class TableReaderXlsxImpl implements ITableReader {
             final byte[] buffer = new byte[TableReaderXlsxImpl.BUFFER_SIZE];
             int readsize = 0;
 
-            // TODO try to use a ram cache for small data to accelerate the reading
             ZipEntry entry = zipInput.getNextEntry();
             while (entry != null) {
                 if (!entry.isDirectory()) {
