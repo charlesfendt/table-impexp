@@ -26,7 +26,6 @@ test-master:
     - 'mvn $MAVEN_CLI_OPTS -U clean deploy -T 1C'
     - '/bin/bash ./calculate-coverage.sh'
     - 'mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.issuesReport.console.enable=true'
-    - '. fetch-sonar-result.sh'
   artifacts:
     expire_in: 1 week
     paths:
@@ -49,7 +48,6 @@ test:
     - 'mvn $MAVEN_CLI_OPTS -U clean deploy -T 1C'
     - '/bin/bash ./calculate-coverage.sh'
     - 'mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.branch.name=$(git rev-parse --abbrev-ref HEAD) -Dsonar.issuesReport.console.enable=true'
-    - '. fetch-sonar-result.sh'
   artifacts:
     expire_in: 1 week
     paths:
@@ -70,7 +68,6 @@ release:
     - 'mvn $MAVEN_CLI_OPTS -U clean deploy -T 1C'
     - '/bin/bash ./calculate-coverage.sh'
     - 'mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.issuesReport.console.enable=true'
-    - '. fetch-sonar-result.sh'
   artifacts:
     expire_in: 3 yrs
     paths:
