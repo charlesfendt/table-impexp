@@ -29,7 +29,6 @@ test-master:
   artifacts:
     expire_in: 1 week
     paths:
-    - sonar-report.xml
     - "*/target/*.jar"
   only:
     - master
@@ -51,7 +50,6 @@ test:
   artifacts:
     expire_in: 1 week
     paths:
-    - sonar-report.xml
     - "*/target/*.jar"
   except:
     - master
@@ -71,7 +69,6 @@ release:
   artifacts:
     expire_in: 3 yrs
     paths:
-    - sonar-report.xml
     - "*/target/*.jar"
   only:
     - tags
