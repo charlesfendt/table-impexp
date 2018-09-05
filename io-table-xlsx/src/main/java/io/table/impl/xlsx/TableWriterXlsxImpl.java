@@ -28,11 +28,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import io.table.api.ITableWriter;
 import io.table.impl.xlsx.utils.CommentCache;
+import io.table.impl.xlsx.utils.RowCellUtils;
 import io.table.impl.xlsx.utils.StringCache;
 import io.table.impl.xlsx.utils.StringEscapeUtils;
 import io.table.impl.xlsx.utils.StyleCache;
@@ -89,6 +91,10 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         this.df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         this.applicationName = applicationName;
+        final boolean matchesVersion = Pattern.matches("[1-9]*\\.[0-9]*", applicationVersion);
+        if (!matchesVersion) {
+            throw new IllegalArgumentException("Invalid application version");
+        }
         this.applicationVersion = applicationVersion;
 
         this.wsName = wsName;
@@ -227,7 +233,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         final int index = this.stringCache.addToCache(value);
 
         final String style = isHeader ? " s=\"1\"" : "";
-        final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+        final String ref = RowCellUtils.colIndexToString(this.indexCol) + Integer.toString(this.indexRow);
 
         final String cellStr = "<c r=\"" + ref + "\" t=\"s\"" + style + "><v>" + Integer.toString(index) + "</v></c>\n";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
@@ -248,7 +254,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         ++this.indexCol;
 
         final String style = isHeader ? " s=\"1\"" : "";
-        final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+        final String ref = RowCellUtils.colIndexToString(this.indexCol) + Integer.toString(this.indexRow);
 
         final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + Long.toString(value) + "</v></c>\n";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
@@ -269,7 +275,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         ++this.indexCol;
 
         final String style = isHeader ? " s=\"1\"" : "";
-        final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+        final String ref = RowCellUtils.colIndexToString(this.indexCol) + Integer.toString(this.indexRow);
 
         final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + Double.toString(value) + "</v></c>\n";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
@@ -290,9 +296,9 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         ++this.indexCol;
 
         // number of days since 01.01.1900 + 2
-        final String val = value == null ? "" : Double.toString(value.getTime() / 86_400_000.0d + 25569.0d);
+        final String val = value == null ? "" : Double.toString(RowCellUtils.getDays(value));
         final String style = isHeader ? " s=\"3\"" : " s=\"2\"";
-        final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+        final String ref = RowCellUtils.colIndexToString(this.indexCol) + Integer.toString(this.indexRow);
 
         final String cellStr = "<c r=\"" + ref + "\" t=\"n\"" + style + "><v>" + val + "</v></c>\n";
         this.outputZip.write(cellStr.getBytes(StandardCharsets.UTF_8));
@@ -355,7 +361,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
             final int index = this.stringCache.addToCache(cell);
 
-            final String ref = TableWriterXlsxImpl.colToString(this.indexCol) + Integer.toString(this.indexRow);
+            final String ref = RowCellUtils.colIndexToString(this.indexCol) + Integer.toString(this.indexRow);
 
             final String cellStr = "<c r=\"" + ref + "\" t=\"s\"" + style + "><v>" + Integer.toString(index)
                     + "</v></c>";
@@ -410,24 +416,6 @@ public final class TableWriterXlsxImpl implements ITableWriter {
             this.outputZip.write("</row>\n".getBytes(StandardCharsets.UTF_8));
             this.rowOpened = false;
         }
-    }
-
-    /**
-     * Convert a column index to a column name.
-     *
-     * @param column
-     *            one-based column index.
-     * @return Column name.
-     */
-    private static String colToString(final int column) {
-        final StringBuilder sb = new StringBuilder();
-        int c = column - 1;
-        while (c >= 0) {
-            final int cur = c % 26;
-            sb.append((char) ('A' + cur));
-            c = (c - cur) / 26 - 1;
-        }
-        return sb.reverse().toString();
     }
 
     /*

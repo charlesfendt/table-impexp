@@ -3,7 +3,7 @@
 
     <groupId>io.table</groupId>
     <artifactId>io-table-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.3.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>io-table-parent</name>
@@ -17,6 +17,29 @@
         </license>
     </licenses>
 
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://hde-tools.metering.corp.diehl.com/jira/secure/Dashboard.jspa</url>
+    </issueManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <url>https://hde-tools.metering.corp.diehl.com/nexus/repository/releases/</url>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>https://hde-tools.metering.corp.diehl.com/nexus/repository/snapshots/</url>
+            <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+        <site>
+            <id>Git LAB</id>
+            <name>Git LAB</name>
+            <url>https://hde-tools.metering.corp.diehl.com/</url>
+        </site>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -28,6 +51,68 @@
         <module>io-table-csv</module>
         <module>io-table-xlsx</module>
     </modules>
+
+    <repositories>
+        <repository>
+            <id>izar-releases</id>
+            <url>https://hde-tools.metering.corp.diehl.com/nexus/repository/releases/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>izar-snapshots</id>
+            <url>https://hde-tools.metering.corp.diehl.com/nexus/repository/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>nexus-public</id>
+            <url>https://hde-tools.metering.corp.diehl.com/nexus/repository/public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>nexus-public</id>
+            <url>https://hde-tools.metering.corp.diehl.com/nexus/repository/public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
+            <id>central</id>
+            <name>Maven Plugin Repository</name>
+            <url>https://repo1.maven.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
+            <id>sonatype-public-repository</id>
+            <url>https://oss.sonatype.org/content/groups/public</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <pluginManagement>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+	xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="x14ac"
+	xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac">
+	<dimension ref="A1:C5" />
+	<sheetViews>
+		<sheetView tabSelected="1" workbookViewId="0">
+			<selection activeCell="B5" sqref="B5" />
+		</sheetView>
+	</sheetViews>
+	<sheetFormatPr baseColWidth="10" defaultColWidth="8.88671875"
+		defaultRowHeight="14.4" />
+	<sheetData>
+		<row r="1" spans="1:3">
+			<c r="A1" s="2" t="s">
+				<v>0</v>
+			</c>
+			<c r="B1" s="2" t="s">
+				<v>1</v>
+			</c>
+			<c r="C1" s="2" t="s">
+				<v>2</v>
+			</c>
+		</row>
+		<row r="2">
+		</row>
+		<row r="3" spans="1:3">
+			<c r="A3" t="s">
+				<v>3</v>
+			</c>
+			<c r="B3">
+				<v>12345</v>
+			</c>
+			<c r="C3" s="1">
+				<v>43167.362633310186</v>
+			</c>
+		</row>
+		<row r="5" spans="1:3">
+			<c r="B5" t="s">
+				<v>4</v>
+			</c>
+		</row>
+	</sheetData>
+	<pageMargins left="0.75" right="0.75" top="0.75" bottom="0.75"
+		header="0.25" footer="0.25" />
+</worksheet>
