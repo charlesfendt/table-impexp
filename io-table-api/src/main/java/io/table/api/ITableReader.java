@@ -33,8 +33,7 @@ import java.util.Date;
 public interface ITableReader extends Closeable {
 
     /**
-     * Initialization method. The goal is to prepare the input stream for the
-     * import.
+     * Initialization method. The goal is to prepare the input stream for the import.
      *
      * @param input
      *            Input stream to wrap.
@@ -45,46 +44,49 @@ public interface ITableReader extends Closeable {
 
     /**
      * Method to change the current row to the next available row.
-     * 
+     *
      * @return False if there is no more rows in the input.
      */
     boolean nextRow();
 
     /**
+     * Method to change the current row to the next available row.
+     *
+     * @return the index of the current row, -1 otherwise
+     */
+    int nextRowInt();
+
+    /**
      * Getter method.
-     * 
-     * @return The amount of column in the current row. If the count is unknown
-     *         (E.g. no current row), the method will return -1.
+     *
+     * @return The amount of column in the current row. If the count is unknown (E.g. no current row), the method will return -1.
      */
     int getColumnCount();
 
     /**
      * Getter method.
-     * 
+     *
      * @param columnId
      *            ID of the column
-     * @return Content of the cell defined by the column ID in the current row. The
-     *         method will return null if the column does not exists.
+     * @return Content of the cell defined by the column ID in the current row. The method will return null if the column does not exists.
      */
     String getCellAsString(final int columnId);
 
     /**
      * Getter method.
-     * 
+     *
      * @param columnId
      *            ID of the column
-     * @return Content of the cell defined by the column ID in the current row. The
-     *         method will return null if the column does not exists.
+     * @return Content of the cell defined by the column ID in the current row. The method will return null if the column does not exists.
      */
     Number getCellAsNumber(final int columnId);
 
     /**
      * Getter method.
-     * 
+     *
      * @param columnId
      *            ID of the column
-     * @return Content of the cell defined by the column ID in the current row. The
-     *         method will return null if the column does not exists.
+     * @return Content of the cell defined by the column ID in the current row. The method will return null if the column does not exists.
      */
     Date getCellAsDate(final int columnId);
 }
