@@ -67,6 +67,7 @@ public class SheetHandlerTest {
 
         // check third value
         final Value valueC1 = valuesRow1.get("C1");
+        Assert.assertNotNull(valueC1);
         // final Date date = (Date) valueC1.getVal(); FIXME
         // Assert.assertEquals(1520494932000l, date.getTime());
         // Assert.assertEquals("C1", valueC1.getCell());

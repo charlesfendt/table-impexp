@@ -83,7 +83,8 @@ public final class XlsxWriterTest {
      *             any I/O error.
      */
     @Test(expected = RuntimeException.class)
+    @SuppressWarnings("resource")
     public void testWrongVersion() throws IOException {
-        final TableWriterXlsxImpl tableWriterXlsxImpl = new TableWriterXlsxImpl("IZARMobile", "2", "ooo");
+        new TableWriterXlsxImpl("IZARMobile", "2", "ooo");
     }
 }

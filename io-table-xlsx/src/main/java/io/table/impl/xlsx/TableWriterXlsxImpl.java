@@ -93,7 +93,7 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         this.applicationName = applicationName;
         final boolean matchesVersion = Pattern.matches("[1-9]*\\.[0-9]*", applicationVersion);
         if (!matchesVersion) {
-            throw new RuntimeException("Invalid application version");
+            throw new IllegalArgumentException("Invalid application version");
         }
         this.applicationVersion = applicationVersion;
 
