@@ -23,7 +23,7 @@ test-master:
   coverage: /^Total coverage. (\d+\.\d+)%/
   script:
     - 'git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"'
-    - 'mvn $MAVEN_CLI_OPTS -U clean deploy site:site site:stage -T 1C'
+    - 'mvn $MAVEN_CLI_OPTS -U clean deploy -T 1C'
     - '/bin/bash ./calculate-coverage.sh'
     - 'mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.issuesReport.console.enable=true'
     - '. fetch-sonar-result.sh'
@@ -46,7 +46,7 @@ test:
   coverage: /^Total coverage. (\d+\.\d+)%/
   script:
     - 'git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"'
-    - 'mvn $MAVEN_CLI_OPTS -U clean deploy site:site site:stage -T 1C'
+    - 'mvn $MAVEN_CLI_OPTS -U clean deploy -T 1C'
     - '/bin/bash ./calculate-coverage.sh'
     - 'mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.branch.name=$(git rev-parse --abbrev-ref HEAD) -Dsonar.issuesReport.console.enable=true'
     - '. fetch-sonar-result.sh'
@@ -67,7 +67,7 @@ release:
     - izar@mobile
   coverage: /^Total coverage. (\d+\.\d+)%/
   script:
-    - 'mvn $MAVEN_CLI_OPTS -U clean deploy site:site site:stage -T 1C'
+    - 'mvn $MAVEN_CLI_OPTS -U clean deploy -T 1C'
     - '/bin/bash ./calculate-coverage.sh'
     - 'mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.issuesReport.console.enable=true'
     - '. fetch-sonar-result.sh'
