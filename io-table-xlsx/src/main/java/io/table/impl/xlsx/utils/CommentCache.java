@@ -20,6 +20,13 @@ public final class CommentCache {
     private final List<Comment> comments = new LinkedList<>();
 
     /**
+     * Method to clear the comment cache.
+     */
+    public void clear() {
+        this.comments.clear();
+    }
+
+    /**
      * Method to add a comment.
      *
      * @param colId
