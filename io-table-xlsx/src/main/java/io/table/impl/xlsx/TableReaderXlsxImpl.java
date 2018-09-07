@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -32,6 +34,9 @@ import io.table.impl.xlsx.utils.sax.handler.SheetHandler;
  */
 public final class TableReaderXlsxImpl implements ITableReader {
 
+    /** Logger for the class. */
+    private static final Logger LOG = Logger.getLogger(TableReaderXlsxImpl.class.getName());
+
     /** size of the buffer. */
     private static final int BUFFER_SIZE = 1024 * 1024;
 
@@ -50,12 +55,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
      * @see java.io.Closeable#close()
      */
     @Override
-    public void close() throws IOException {
-        // remove temporary files...
-        // for (final Map.Entry<String, InputStream> entry : this.tmps.entrySet()) {
-        // // entry.getValue().delete();
-        // entry.getValue().close();
-        // }
+    public void close() {
         this.tmps.clear();
     }
 
@@ -90,6 +90,12 @@ public final class TableReaderXlsxImpl implements ITableReader {
 
         try {
             final SAXParserFactory factory = SAXParserFactory.newInstance();
+            try {
+                factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing", true); //$NON-NLS-1$
+            } catch (final Exception ex) {
+                TableReaderXlsxImpl.LOG.info("Secure parsing not supported..."); //$NON-NLS-1$
+                TableReaderXlsxImpl.LOG.log(Level.FINER, "Secure parsing not supported...", ex); //$NON-NLS-1$
+            }
             final SAXParser saxParser = factory.newSAXParser();
 
             // verify that we have a description file !
@@ -128,7 +134,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
                 this.rows = handler.getRows();
             }
         } catch (final Exception e) {
-            e.printStackTrace(); // FIXME logging
+            TableReaderXlsxImpl.LOG.log(Level.INFO, "Reading error", e);
         }
 
     }

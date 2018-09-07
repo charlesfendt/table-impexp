@@ -56,8 +56,6 @@ public final class TableWriterXlsxImpl implements ITableWriter {
     /** The version of the application. */
     private final String applicationVersion;
 
-    /** The name of the worksheet. */
-    private String wsName;
     /** The counter for the amount of worksheet. */
     private int wsCount;
 
@@ -104,7 +102,6 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         }
         this.applicationVersion = applicationVersion;
 
-        this.wsName = wsName;
         final int index = ++this.wsCount;
         final String fileName = "sheet" + index + ".xml";
 
@@ -112,6 +109,12 @@ public final class TableWriterXlsxImpl implements ITableWriter {
 
     }
 
+    /**
+     * Method to close the current tab.
+     *
+     * @throws IOException
+     *             Any I/O error.
+     */
     private void closeWs() throws IOException {
         this.closeRow();
         this.outputZip.write(
@@ -286,7 +289,6 @@ public final class TableWriterXlsxImpl implements ITableWriter {
     public void openNewWs(final String wsName) throws IOException {
         this.closeWs();
 
-        this.wsName = wsName;
         final int index = ++this.wsCount;
         final String fileName = "sheet" + index + ".xml";
         this.wsList.add(new WsDesc(wsName, fileName, index));
@@ -533,6 +535,11 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         this.appendCell(value, false, null);
     }
 
+    /**
+     * POJO for work sheet description.
+     *
+     * @author fendtc
+     */
     private static final class WsDesc {
 
         /** Name of the worksheet. */
@@ -542,6 +549,16 @@ public final class TableWriterXlsxImpl implements ITableWriter {
         /** index for the tab. */
         private final int index;
 
+        /**
+         * Constructor of the POJO.
+         *
+         * @param name
+         *            Name of the worksheet.
+         * @param fileName
+         *            file name.
+         * @param index
+         *            Index in the tab order.
+         */
         public WsDesc(final String name, final String fileName, final int index) {
             super();
             this.name = name;
