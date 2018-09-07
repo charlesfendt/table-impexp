@@ -68,24 +68,37 @@ public final class EncodingDetectionHelper {
         return new String(data, offset, data.length - offset, encoding);
     }
 
-    // returns the BOM in the stream, NULL if not present,
-    // if there was BOM the in the stream it is consumed
-    private static Charset getBOMEncoding(final byte[] data) throws IOException {
+    /**
+     * Method to read and get the BOM encoding.
+     *
+     * @param data
+     *            Data to parse.
+     * @return returns the BOM in the stream, NULL if not present, if there was BOM the in the stream it is consumed
+     */
+    private static Charset getBOMEncoding(final byte[] data) {
         Charset encoding = null;
 
-        if (data[0] == 0xFE && data[1] == 0xFF) {
+        final int data0 = data[0] & 0xFF;
+        final int data1 = data[1] & 0xFF;
+        final int data2 = data[2] & 0xFF;
+        if (data0 == 0xFE && data1 == 0xFF) {
             encoding = StandardCharsets.UTF_16BE;
-        } else if (data[0] == 0xFF && data[1] == 0xFE) {
+        } else if (data0 == 0xFF && data1 == 0xFE) {
             encoding = StandardCharsets.UTF_16LE;
-        } else if (data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF) {
+        } else if (data0 == 0xEF && data1 == 0xBB && data2 == 0xBF) {
             encoding = StandardCharsets.UTF_8;
         }
         return encoding;
     }
 
-    // returns the best guess for the encoding by looking the first bytes of the
-    // stream, '<?xm'
-    private static Charset getXMLGuessEncoding(final byte[] data) throws IOException {
+    /**
+     * Getter.
+     *
+     * @param data
+     *            Data to parse.
+     * @return returns the best guess for the encoding by looking the first bytes of the stream, 'xml' meta-tag.
+     */
+    private static Charset getXMLGuessEncoding(final byte[] data) {
         Charset encoding = null;
 
         final int data0 = data[0] & 0xFF;

@@ -55,12 +55,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
      * @see java.io.Closeable#close()
      */
     @Override
-    public void close() throws IOException {
-        // remove temporary files...
-        // for (final Map.Entry<String, InputStream> entry : this.tmps.entrySet()) {
-        // // entry.getValue().delete();
-        // entry.getValue().close();
-        // }
+    public void close() {
         this.tmps.clear();
     }
 
@@ -206,7 +201,7 @@ public final class TableReaderXlsxImpl implements ITableReader {
     public Number getCellAsNumber(final int columnId) {
         final Value val = this.currentRow.getValues()
                 .get(RowCellUtils.colIndexToString(columnId) + this.currentRow.getIndex());
-        return Double.parseDouble(val.getVal().toString());
+        return Double.valueOf(val.getVal().toString());
     }
 
     /*

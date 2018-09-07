@@ -99,7 +99,7 @@ public final class TableWriterCsvImpl implements ITableWriter {
      * @see io.table.api.ITableWriter#initialize(java.io.OutputStream)
      */
     @Override
-    public void initialize(final OutputStream output) throws IOException {
+    public void initialize(final OutputStream output) {
 
         if (output == null) {
             throw new IllegalArgumentException("The output stream must not be null.");
