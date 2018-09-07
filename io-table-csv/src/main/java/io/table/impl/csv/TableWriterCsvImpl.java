@@ -49,9 +49,9 @@ public final class TableWriterCsvImpl implements ITableWriter {
     /** the escape sequence for the quote. */
     private final String escape;
     /** The newline separator. */
-    final String newLine;
+    private final String newLine;
     /** The charset to use. */
-    final Charset charset;
+    private final Charset charset;
 
     /** The wrapped stream. */
     private Writer outputWriter;
@@ -236,7 +236,7 @@ public final class TableWriterCsvImpl implements ITableWriter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see io.table.api.ITableWriter#appendNewHeaderLine(java.lang.String[])
      */
     @Override

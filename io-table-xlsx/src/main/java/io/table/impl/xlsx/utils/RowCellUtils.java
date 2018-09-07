@@ -13,7 +13,7 @@ public final class RowCellUtils {
 
     /** Private constructor, utility class. */
     private RowCellUtils() {
-        // nothing to do
+        super();
     }
 
     /**
@@ -29,7 +29,7 @@ public final class RowCellUtils {
         while (c >= 0) {
             final int cur = c % 26;
             sb.append((char) ('A' + cur));
-            c = ((c - cur) / 26) - 1;
+            c = (c - cur) / 26 - 1;
         }
         return sb.reverse().toString();
     }
@@ -47,7 +47,7 @@ public final class RowCellUtils {
         int charCount = 0;
         for (int i = charArray.length - 1; i >= 0; i--) {
             final char c = charArray[i];
-            if ((c >= 65) && (c <= 90)) {
+            if (c >= 65 && c <= 90) {
                 colIndex += (c - 64) * Math.pow(26, charCount);
                 charCount++;
             }
@@ -63,7 +63,7 @@ public final class RowCellUtils {
      * @return the number of days since 1.1.1900 +2
      */
     public static double getDays(final Date value) {
-        return (value.getTime() / 86_400_000.0d) + 25569.0d;
+        return value.getTime() / 86_400_000.0d + 25569.0d;
     }
 
     /**
@@ -74,7 +74,7 @@ public final class RowCellUtils {
      * @return the date
      */
     public static Date getDateFromDays(final double value) {
-        final long curVal = Math.round(((value - 25569.0d) * 86_400_000.0d) / 1000.d) * 1000L;
+        final long curVal = Math.round((value - 25569.0d) * 86_400_000.0d / 1000.d) * 1000L;
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(curVal);
         return cal.getTime();
