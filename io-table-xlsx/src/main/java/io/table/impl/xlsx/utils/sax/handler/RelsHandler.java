@@ -3,14 +3,15 @@ package io.table.impl.xlsx.utils.sax.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.table.impl.xlsx.utils.pojo.RelationShip;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import io.table.impl.xlsx.utils.pojo.RelationShip;
+
 /**
  * Relationship handler.
- * 
+ *
  * @author smarty
  *
  */
@@ -20,7 +21,9 @@ public class RelsHandler extends DefaultHandler {
     private final Map<String, RelationShip> availableRelationsShips = new HashMap<>();
     /** Current identifier for file name. */
     private String identifier = null;
+    /** Type. */
     private String type = null;
+    /** Target. */
     private String target = null;
 
     /*
