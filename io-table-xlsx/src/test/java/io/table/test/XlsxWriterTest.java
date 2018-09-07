@@ -82,6 +82,52 @@ public final class XlsxWriterTest {
      * @throws IOException
      *             any I/O error.
      */
+    @Test
+    public void testMultiOutput() throws IOException {
+        final File out = new File("./testWrite-multi.xlsx");
+        out.createNewFile();
+        try (final OutputStream output = new FileOutputStream(out)) {
+
+            final TableWriterXlsxImpl writer = new TableWriterXlsxImpl("IZARMobile", "2.0", "ooo");
+            writer.initialize(output);
+            // writer.appendNewHeaderLine("a", "b", "c");
+            writer.appendCell("a", true, "Comment / a");
+            writer.appendCell("b", true, "Comment <b");
+            writer.appendCell("c", true, "Comment > c");
+            writer.appendNewLine();
+            writer.appendCell("foo");
+            writer.appendCell(12345);
+            writer.appendCell(12345.678);
+            writer.appendNewLine();
+            writer.appendCell("777.333");
+            writer.appendCell(new Date());
+            writer.appendNewLine();
+            writer.appendCell("123456");
+            writer.appendCell("123456 / ");
+            writer.appendCell("123456 <");
+            writer.appendCell("m³");
+            writer.appendCell("IZAR RADIO EXTERN RS232 / L-BUS (v62)");
+            writer.appendCell("values.volume.main (MEASUREMENT UNITS)");
+            writer.appendCell((String) null);
+
+            writer.openNewWs("Foo");
+            writer.appendCell("foo");
+            writer.appendNewLine();
+            writer.appendCell("a", true, "Comment / a");
+
+            writer.openNewWs("Bar");
+            writer.appendCell("bar");
+
+            writer.close();
+        }
+    }
+
+    /**
+     * Test method for a simple output.
+     *
+     * @throws IOException
+     *             any I/O error.
+     */
     @Test(expected = RuntimeException.class)
     @SuppressWarnings("resource")
     public void testWrongVersion() throws IOException {
